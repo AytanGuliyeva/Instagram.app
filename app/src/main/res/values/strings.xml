@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">Instagram.app</string>
+    <string name="username_email_or_mobile_number">Username,email or mobile number</string>
+    <string name="log_in">Log in</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="password">Password</string>
+    <string name="instagram_icon">instagram_icon</string>
+    <string name="create_new_account">Create new account</string>
+    <string name="back">back</string>
+    <string name="what_s_your_name">What\'s your name?</string>
+    <string name="full_name">Full name</string>
+    <string name="next">Next</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="create_a_password_with_at_least_6_letters">Create a password with at least 6 letters or numbers.It should be something others can\'t guess.</string>
+    <string name="create_a_password">Create a password</string>
+
 </resources>
