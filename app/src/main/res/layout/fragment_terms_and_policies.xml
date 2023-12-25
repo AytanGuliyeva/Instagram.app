@@ -4,9 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".PasswordFragment"
-    android:background="@drawable/login_background"
-    >
+    tools:context=".TermsAndPoliciesFragment"
+    android:background="@drawable/login_background">
 
 
     <ImageButton
@@ -21,10 +20,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/txtCreatePassword"
+        android:id="@+id/txtAgreeTermsAndPolicies"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/create_a_password"
+        android:text="@string/agree_to_instagram_s_terms_and_policies"
         android:textSize="35sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@id/guideline2"
@@ -32,41 +31,28 @@
         app:layout_constraintTop_toBottomOf="@+id/btnBack"
         />
     <TextView
-        android:id="@+id/txtCreatePasswordExplanation"
+        android:id="@+id/txtAgreeTermsText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:text="@string/create_a_password_with_at_least_6_letters"
+        android:text="People who use our service may have uploaded your contact information to Instagram. Learn more..By tapping I agree, you agree to create an account and to Instagram's Terms,Privacy Policy and Cookies Policy. The Privacy describes the ways we can use the information we collect when you create an account. For example, we use this information to provide, personalize and improve our product, including ads. "
         app:layout_constraintEnd_toEndOf="@id/guideline2"
         app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/txtCreatePassword"
+        app:layout_constraintTop_toBottomOf="@+id/txtAgreeTermsAndPolicies"
         />
 
-    <EditText
-        android:id="@+id/edtPassword"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:autofillHints="name"
-        android:background="@drawable/login_edit_background"
-        android:hint="@string/password"
-        android:inputType="textPassword"
-        android:padding="15dp"
-        android:drawableEnd="@drawable/hide"
-        app:layout_constraintEnd_toEndOf="@id/guideline2"
-        app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/txtCreatePasswordExplanation" />
 
     <Button
-        android:id="@+id/btnNext"
+        android:id="@+id/btnIAgree"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:backgroundTint="@color/blue"
-        android:text="@string/next"
+        android:text="@string/i_agree"
         app:layout_constraintEnd_toEndOf="@id/guideline2"
         app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
+        app:layout_constraintBottom_toTopOf="@+id/btnText"
+        />
 
     <Button
         android:id="@+id/btnText"
@@ -95,5 +81,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.9" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,5 +13,32 @@
     <string name="already_have_an_account">Already have an account?</string>
     <string name="create_a_password_with_at_least_6_letters">Create a password with at least 6 letters or numbers.It should be something others can\'t guess.</string>
     <string name="create_a_password">Create a password</string>
+    <string name="save_your_login_info">Save your login info?</string>
+    <string name="we_ll_save_info">We\'ll save the login info for cloud,so you won\'t need to enter it next time you log in.</string>
+    <string name="save">Save</string>
+    <string name="not_now">Not now</string>
+    <string name="what_s_your_birthday">What\'s your birthday?</string>
+    <string name="use_your_own_birthday">Use your own birthday,even if this account is for a business, a pet or something else. No one will see this unless you choose to share it.</string>
+    <string name="birthday">Birthday</string>
+    <string name="create_a_username">Create a username</string>
+    <string name="add_a_username">Add a username or use our suggestion You can change this at any time.</string>
+    <string name="username">Username</string>
+    <string name="what_s_your_mobile_number">What\'s your mobile number?</string>
+    <string name="enter_the_mobile">Enter the mobile number where you can be contacted. No one will see this on your profile.</string>
+    <string name="mobile_number">Mobile number</string>
+    <string name="receive_sms">You may receive SMS notifications from us for security and login purposes.</string>
+    <string name="sign_up_with_email">Sign up with email</string>
+    <string name="what_s_your_email">What\'s your email?</string>
+    <string name="enter_the_email">Enter the email where you can be contacted. No one will see this on your profile.</string>
+    <string name="email">Email</string>
+    <string name="sign_up_with_mobile_number">Sign up with mobile Number</string>
+    <string name="enter_the_6_digit_code">To confirm your account, enter the 6-digit code we sent to your number</string>
+    <string name="i_didn_t_get_the_code">I didn\'t get the code</string>
+    <string name="enter_the_confirmation_code">Enter the confirmation code</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="agree_to_instagram_s_terms_and_policies">Agree to Instagram\'s terms and policies</string>
+    <string name="i_agree">I agree</string>
+    <string name="sign_up">Sign Up</string>
 
 </resources>

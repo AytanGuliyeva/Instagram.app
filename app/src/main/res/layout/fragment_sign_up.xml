@@ -4,69 +4,71 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".PasswordFragment"
-    android:background="@drawable/login_background"
-    >
+    tools:context=".SignUpFragment"
+    android:background="@drawable/login_background">
 
-
-    <ImageButton
-        android:id="@+id/btnBack"
+    <ImageView
+        android:id="@+id/instagramIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:contentDescription="@string/back"
-        android:padding="15dp"
-        android:src="@drawable/back_button"
+        android:src="@drawable/instagram_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.2"
+        android:contentDescription="@string/instagram_icon"/>
 
-    <TextView
-        android:id="@+id/txtCreatePassword"
+    <EditText
+        android:id="@+id/edtUsername"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/create_a_password"
-        android:textSize="35sp"
-        android:textStyle="bold"
+        android:layout_marginTop="30dp"
+        android:padding="15dp"
+        android:inputType="text"
+        android:autofillHints="username"
+        android:background="@drawable/login_edit_background"
+        android:hint="@string/username"
         app:layout_constraintEnd_toEndOf="@id/guideline2"
         app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/btnBack"
-        />
-    <TextView
-        android:id="@+id/txtCreatePasswordExplanation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="@string/create_a_password_with_at_least_6_letters"
-        app:layout_constraintEnd_toEndOf="@id/guideline2"
-        app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/txtCreatePassword"
-        />
-
+        app:layout_constraintTop_toBottomOf="@+id/instagramIcon" />
     <EditText
         android:id="@+id/edtPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:autofillHints="name"
+        android:layout_marginTop="15dp"
+        android:padding="15dp"
         android:background="@drawable/login_edit_background"
         android:hint="@string/password"
+        android:autofillHints="password"
         android:inputType="textPassword"
-        android:padding="15dp"
-        android:drawableEnd="@drawable/hide"
         app:layout_constraintEnd_toEndOf="@id/guideline2"
         app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/txtCreatePasswordExplanation" />
-
-    <Button
-        android:id="@+id/btnNext"
+        app:layout_constraintTop_toBottomOf="@+id/edtUsername" />
+    <EditText
+        android:id="@+id/edtEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:padding="15dp"
+        android:background="@drawable/login_edit_background"
+        android:hint="Email"
+        android:autofillHints="password"
+        android:inputType="textEmailAddress"
+        app:layout_constraintEnd_toEndOf="@id/guideline2"
+        app:layout_constraintStart_toStartOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSignUp"
+        android:text="@string/sign_up"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:backgroundTint="@color/blue"
-        android:text="@string/next"
         app:layout_constraintEnd_toEndOf="@id/guideline2"
         app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/edtEmail"
+        />
 
     <Button
         android:id="@+id/btnText"
@@ -88,12 +90,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.1" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.9" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

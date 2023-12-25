@@ -14,4 +14,29 @@
     <string name="already_have_an_account">Artıq hesabınız var?</string>
     <string name="create_a_password_with_at_least_6_letters">Ən azı 6 hərfdən və ya rəqəmdən ibarət bir şifrə yaradın. Onun başqalarının tapa bilməyəcəyi bir şey olmasını tövsiyyə edirik.</string>
     <string name="create_a_password">Şifrə yaradın</string>
+    <string name="save_your_login_info">Giriş məlumatları yadda saxlansın?</string>
+    <string name="we_ll_save_info">Ad üçün giriş məlumatlarınızı yadda saxlayacağıq, beləliklə növbəti giriş zamanı məlumatları daxil etməli olmayacaqsınız.</string>
+    <string name="save">Yadda saxla</string>
+    <string name="not_now">Daha sonra</string>
+    <string name="what_s_your_birthday">Doğum gününüz nə vaxtdır?</string>
+    <string name="use_your_own_birthday">Bu hesab biznes, ev heyvanı və ya başqa bir şey üçün olsa belə, öz ad gününüzü istifadə edin. Siz paylaşmağı seçməyincə bunu heç kim görməyəcək.</string>
+    <string name="birthday">Doğum günü</string>
+    <string name="create_a_username">İstifadəçi adı yaradın</string>
+    <string name="add_a_username">İstifadəçi adı əlavə edin və ya təklifimizdən istifadə edin. Bunu istədiyiniz zaman dəyişə bilərsiniz.</string>
+    <string name="username">İstifadəçi adı</string>
+    <string name="what_s_your_mobile_number">Mobil nömrənizi yazın.</string>
+    <string name="enter_the_mobile">İnsanların sizinlə əlaqə saxlaya biləcəyi mobil telefon nömrəsi daxil edin.Onu başqa heç kim profilinizdə görməyəcək.</string>
+    <string name="mobile_number">Mobil nömrə</string>
+    <string name="receive_sms">Təhlükəsizlik və giriş məqsədləri üçün bizdən SMS bildirişləri ala bilərsiniz.</string>
+    <string name="sign_up_with_email">E-poçt ünvanı ilə qeydiyyat</string>
+    <string name="what_s_your_email">E-poçt ünvanınız nədir?</string>
+    <string name="enter_the_email">İnsanların sizinlə əlaqə saxlaya biləcəyi e-poçt ünvanı daxil edin. Onu başqa heç kim profilinizdə görməyəcək.</string>
+    <string name="email">E-poçt ünvanı</string>
+    <string name="sign_up_with_mobile_number">Mobil nömrə ilə qeydiyyatdan keçin</string>
+    <string name="enter_the_6_digit_code">Hesabınızı təsdiqləmək üçün nömrənizə göndərdiyimiz 6 rəqəmli kodu daxil edin</string>
+    <string name="i_didn_t_get_the_code">Kodu almamışam</string>
+    <string name="enter_the_confirmation_code">Təsdiq kodunu daxil edin</string>
+
+
+
 </resources>

@@ -71,6 +71,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btnLogin"
         />
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCreateNewAccount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/create_new_account"

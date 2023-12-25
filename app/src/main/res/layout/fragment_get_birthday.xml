@@ -4,10 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".PasswordFragment"
+    tools:context=".GetBirthdayFragment"
     android:background="@drawable/login_background"
     >
-
 
     <ImageButton
         android:id="@+id/btnBack"
@@ -21,10 +20,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/txtCreatePassword"
+        android:id="@+id/txtBirthday"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/create_a_password"
+        android:text="@string/what_s_your_birthday"
         android:textSize="35sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@id/guideline2"
@@ -32,30 +31,29 @@
         app:layout_constraintTop_toBottomOf="@+id/btnBack"
         />
     <TextView
-        android:id="@+id/txtCreatePasswordExplanation"
+        android:id="@+id/txtBirthdayExplanation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:text="@string/create_a_password_with_at_least_6_letters"
+        android:text="@string/use_your_own_birthday"
         app:layout_constraintEnd_toEndOf="@id/guideline2"
         app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/txtCreatePassword"
+        app:layout_constraintTop_toBottomOf="@+id/txtBirthday"
         />
 
     <EditText
-        android:id="@+id/edtPassword"
+        android:id="@+id/edtBirthday"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:autofillHints="name"
         android:background="@drawable/login_edit_background"
-        android:hint="@string/password"
-        android:inputType="textPassword"
+        android:hint="@string/birthday"
+        android:inputType="date"
         android:padding="15dp"
-        android:drawableEnd="@drawable/hide"
         app:layout_constraintEnd_toEndOf="@id/guideline2"
         app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/txtCreatePasswordExplanation" />
+        app:layout_constraintTop_toBottomOf="@+id/txtBirthdayExplanation" />
 
     <Button
         android:id="@+id/btnNext"
@@ -66,7 +64,7 @@
         android:text="@string/next"
         app:layout_constraintEnd_toEndOf="@id/guideline2"
         app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/edtBirthday" />
 
     <Button
         android:id="@+id/btnText"
