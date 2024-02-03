@@ -6,7 +6,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MobileCodeFragment"
     android:background="@drawable/login_background">
-
     <ImageButton
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
