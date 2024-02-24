@@ -40,5 +40,8 @@
     <string name="agree_to_instagram_s_terms_and_policies">Agree to Instagram\'s terms and policies</string>
     <string name="i_agree">I agree</string>
     <string name="sign_up">Sign Up</string>
+    <string name="like">like</string>
+    <string name="dm">dm</string>
+    <string name="story">story</string>
 
 </resources>
