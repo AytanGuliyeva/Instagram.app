@@ -43,5 +43,10 @@
     <string name="like">like</string>
     <string name="dm">dm</string>
     <string name="story">story</string>
+    <string name="main">main</string>
+    <string name="search">search</string>
+    <string name="add">add</string>
+    <string name="reels">reels</string>
+    <string name="profile">profile</string>
 
 </resources>
