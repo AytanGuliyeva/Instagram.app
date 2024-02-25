@@ -48,5 +48,10 @@
     <string name="add">add</string>
     <string name="reels">reels</string>
     <string name="profile">profile</string>
+    <string name="comment">comment</string>
+    <string name="share">share</string>
+    <string name="saved">saved</string>
+    <string name="post">Post</string>
+    <string name="option">option</string>
 
 </resources>
