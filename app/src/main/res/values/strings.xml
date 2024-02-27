@@ -53,5 +53,12 @@
     <string name="saved">saved</string>
     <string name="post">Post</string>
     <string name="option">option</string>
+    <string name="menu">Menu</string>
+    <string name="_0">0</string>
+    <string name="posts">posts</string>
+    <string name="followers">followers</string>
+    <string name="following">following</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="share_profile">Share Profile</string>
 
 </resources>

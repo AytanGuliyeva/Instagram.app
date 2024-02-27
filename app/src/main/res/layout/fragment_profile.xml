@@ -1,14 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".coreFeatures.ProfileFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:id="@+id/txtProfileName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/username"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</FrameLayout>
+    <ImageButton
+        android:id="@+id/btnMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:contentDescription="@string/menu"
+        android:padding="13dp"
+        android:src="@drawable/menu_icon"
+        app:layout_constraintBottom_toBottomOf="@+id/txtProfileName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgProfile"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_margin="10dp"
+        android:src="@drawable/profile_photo_default"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtProfileName" />
+
+    <TextView
+        android:id="@+id/txtPostCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/_0"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/txtPost"
+        app:layout_constraintEnd_toEndOf="@id/txtPost"
+        app:layout_constraintStart_toStartOf="@id/txtPost"
+        app:layout_constraintTop_toTopOf="@+id/imgProfile" />
+
+    <TextView
+        android:id="@+id/txtPost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/posts"
+        app:layout_constraintBottom_toBottomOf="@+id/imgProfile"
+        app:layout_constraintEnd_toStartOf="@id/txtFollowers"
+        app:layout_constraintTop_toTopOf="@+id/imgProfile" />
+
+    <TextView
+        android:id="@+id/txtFollowersCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/_0"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/txtFollowers"
+        app:layout_constraintEnd_toEndOf="@id/txtFollowers"
+        app:layout_constraintStart_toStartOf="@+id/txtFollowers"
+        app:layout_constraintTop_toTopOf="@+id/imgProfile" />
+
+    <TextView
+        android:id="@+id/txtFollowers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/followers"
+        app:layout_constraintBottom_toBottomOf="@+id/imgProfile"
+        app:layout_constraintEnd_toStartOf="@+id/txtFollowing"
+        app:layout_constraintTop_toTopOf="@+id/imgProfile" />
+
+    <TextView
+        android:id="@+id/txtFollowingCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/_0"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/txtFollowing"
+        app:layout_constraintEnd_toEndOf="@id/txtFollowing"
+        app:layout_constraintStart_toStartOf="@id/txtFollowing"
+        app:layout_constraintTop_toTopOf="@+id/imgProfile" />
+
+    <TextView
+        android:id="@+id/txtFollowing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/following"
+        app:layout_constraintBottom_toBottomOf="@+id/imgProfile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imgProfile" />
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnEditProfile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/edit_profile"
+        android:background="@drawable/search_background"
+        android:backgroundTint="@color/grey2"
+        android:padding="10dp"
+
+        android:layout_margin="15dp"
+        app:layout_constraintEnd_toStartOf="@+id/btnShareProfile"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgProfile"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnShareProfile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/share_profile"
+        android:background="@drawable/search_background"
+        android:backgroundTint="@color/grey2"
+        android:padding="10dp"
+        android:layout_margin="15dp"
+        app:layout_constraintStart_toEndOf="@id/btnEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/imgProfile"/>
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btnAddUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/search_background"
+        app:layout_constraintStart_toEndOf="@id/btnShareProfile"
+        app:layout_constraintTop_toTopOf="@id/btnShareProfile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/btnShareProfile"
+        android:src="@drawable/add_user_icon"/>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
