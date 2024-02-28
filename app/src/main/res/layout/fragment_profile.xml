@@ -110,7 +110,6 @@
         android:text="@string/edit_profile"
         android:background="@drawable/search_background"
         android:backgroundTint="@color/grey2"
-        android:padding="10dp"
 
         android:layout_margin="15dp"
         app:layout_constraintEnd_toStartOf="@+id/btnShareProfile"
@@ -125,20 +124,53 @@
         android:text="@string/share_profile"
         android:background="@drawable/search_background"
         android:backgroundTint="@color/grey2"
-        android:padding="10dp"
-        android:layout_margin="15dp"
+        android:layout_marginVertical="15dp"
+        app:layout_constraintEnd_toStartOf="@id/btnAddUser"
         app:layout_constraintStart_toEndOf="@id/btnEditProfile"
         app:layout_constraintTop_toBottomOf="@+id/imgProfile"/>
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btnAddUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/add_user"
         android:background="@drawable/search_background"
-        app:layout_constraintStart_toEndOf="@id/btnShareProfile"
         app:layout_constraintTop_toTopOf="@id/btnShareProfile"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="15dp"
+        android:padding="13dp"
+        app:layout_constraintStart_toEndOf="@id/btnShareProfile"
         app:layout_constraintBottom_toBottomOf="@+id/btnShareProfile"
         android:src="@drawable/add_user_icon"/>
+    <View
+        android:id="@+id/viewProfile"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnShareProfile"
+        android:background="@color/grey2"
+        android:layout_marginVertical="10dp"
+        />
+    <ImageView
+        android:id="@+id/imgCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintTop_toBottomOf="@+id/viewProfile"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/camera_icon"/>
+    <TextView
+        android:id="@+id/txtNoPost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textStyle="bold"
+        android:textSize="25sp"
+        app:layout_constraintTop_toBottomOf="@+id/imgCamera"
+        android:text="No posts yet"/>
 
 
 
