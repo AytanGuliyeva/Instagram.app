@@ -61,5 +61,6 @@
     <string name="edit_profile">Edit Profile</string>
     <string name="share_profile">Share Profile</string>
     <string name="add_user">add user</string>
+    <string name="no_posts_yet">No posts yet</string>
 
 </resources>
