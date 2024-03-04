@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.instagramapp.authorization.LoginFragment"
+        android:name="com.example.instagramapp.authorization.login.LoginFragment"
         android:label="LoginFragment"
         tools:layout="@layout/fragment_login"
         >
@@ -78,7 +78,7 @@
         tools:layout="@layout/fragment_terms_and_policies" />
     <fragment
         android:id="@+id/signUpFragment"
-        android:name="com.example.instagramapp.authorization.SignUpFragment"
+        android:name="com.example.instagramapp.authorization.signUp.SignUpFragment"
         android:label="fragment_sign_up"
         tools:layout="@layout/fragment_sign_up" >
         <action
@@ -89,27 +89,27 @@
     </fragment>
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.instagramapp.coreFeatures.MainFragment"
+        android:name="com.example.instagramapp.coreFeatures.main.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" />
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.example.instagramapp.coreFeatures.SearchFragment"
+        android:name="com.example.instagramapp.coreFeatures.search.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" />
     <fragment
         android:id="@+id/addImageFragment"
-        android:name="com.example.instagramapp.coreFeatures.AddImageFragment"
+        android:name="com.example.instagramapp.coreFeatures.addImage.AddImageFragment"
         android:label="fragment_add_image"
         tools:layout="@layout/fragment_add_image" />
     <fragment
         android:id="@+id/reelsFragment"
-        android:name="com.example.instagramapp.coreFeatures.ReelsFragment"
+        android:name="com.example.instagramapp.coreFeatures.reels.ReelsFragment"
         android:label="fragment_reels"
         tools:layout="@layout/fragment_reels" />
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.example.instagramapp.coreFeatures.ProfileFragment"
+        android:name="com.example.instagramapp.coreFeatures.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
 </navigation>

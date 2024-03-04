@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".coreFeatures.ProfileFragment">
+    tools:context=".coreFeatures.profile.ProfileFragment">
 
     <TextView
         android:id="@+id/txtProfileName"
@@ -58,6 +58,7 @@
         android:text="@string/posts"
         app:layout_constraintBottom_toBottomOf="@+id/imgProfile"
         app:layout_constraintEnd_toStartOf="@id/txtFollowers"
+        app:layout_constraintStart_toEndOf="@+id/imgProfile"
         app:layout_constraintTop_toTopOf="@+id/imgProfile" />
 
     <TextView
@@ -78,6 +79,7 @@
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="10dp"
         android:text="@string/followers"
+        app:layout_constraintStart_toEndOf="@+id/txtPost"
         app:layout_constraintBottom_toBottomOf="@+id/imgProfile"
         app:layout_constraintEnd_toStartOf="@+id/txtFollowing"
         app:layout_constraintTop_toTopOf="@+id/imgProfile" />
@@ -100,6 +102,7 @@
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="10dp"
         android:text="@string/following"
+        app:layout_constraintStart_toEndOf="@+id/txtFollowers"
         app:layout_constraintBottom_toBottomOf="@+id/imgProfile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imgProfile" />

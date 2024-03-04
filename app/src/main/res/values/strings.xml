@@ -50,7 +50,7 @@
     <string name="profile">profile</string>
     <string name="comment">comment</string>
     <string name="share">share</string>
-    <string name="saved">saved</string>
+    <string name="saved">Saved</string>
     <string name="post">Post</string>
     <string name="option">option</string>
     <string name="menu">Menu</string>
@@ -62,5 +62,13 @@
     <string name="share_profile">Share Profile</string>
     <string name="add_user">add user</string>
     <string name="no_posts_yet">No posts yet</string>
+    <string name="settings_and_privacy">Settings and privacy</string>
+    <string name="your_activity">Your activity</string>
+    <string name="archive">Archive</string>
+    <string name="qr_code">QR code</string>
+    <string name="supervision">Supervision</string>
+    <string name="orders_and_payments">Orders and payments</string>
+    <string name="lists">Lists</string>
+    <string name="favorites">Favorites</string>
 
 </resources>
