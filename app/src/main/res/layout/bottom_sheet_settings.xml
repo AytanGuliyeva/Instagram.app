@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomSheetRootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/bottomSheetRootLayout"
-    android:background="@drawable/dialog_bg">
+    android:background="@drawable/dialog_bg"
+    android:padding="20dp">
 
     <TextView
 
@@ -14,6 +15,7 @@
         android:layout_marginTop="5dp"
         android:drawablePadding="5dp"
         android:text="@string/settings_and_privacy"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:drawableStartCompat="@drawable/settings_icon"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,6 +37,7 @@
         android:layout_marginTop="5dp"
         android:drawablePadding="5dp"
         android:text="@string/your_activity"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:drawableStartCompat="@drawable/activity_icon"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,6 +60,7 @@
         android:layout_marginTop="5dp"
         android:drawablePadding="5dp"
         android:text="@string/archive"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:drawableStartCompat="@drawable/archive_icon"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,6 +82,7 @@
         android:layout_marginTop="5dp"
         android:drawablePadding="5dp"
         android:text="@string/qr_code"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:drawableStartCompat="@drawable/qr_code_icon"
         app:layout_constraintStart_toStartOf="parent"
@@ -99,6 +104,7 @@
         android:layout_marginTop="5dp"
         android:drawablePadding="5dp"
         android:text="@string/saved"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:drawableStartCompat="@drawable/save_icon"
         app:layout_constraintStart_toStartOf="parent"
@@ -120,6 +126,7 @@
         android:layout_marginTop="5dp"
         android:drawablePadding="5dp"
         android:text="@string/supervision"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:drawableStartCompat="@drawable/supervision_icon"
         app:layout_constraintStart_toStartOf="parent"
@@ -140,6 +147,7 @@
         android:layout_height="wrap_content"
         android:drawablePadding="5dp"
         android:text="@string/orders_and_payments"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:drawableStartCompat="@drawable/payment_icon"
         app:layout_constraintStart_toStartOf="parent"
@@ -161,6 +169,7 @@
         android:layout_marginTop="5dp"
         android:drawablePadding="5dp"
         android:text="@string/lists"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:drawableStartCompat="@drawable/lists_icon"
         app:layout_constraintStart_toStartOf="parent"
@@ -182,6 +191,7 @@
         android:layout_marginTop="5dp"
         android:drawablePadding="5dp"
         android:text="@string/favorites"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:drawableStartCompat="@drawable/favorites_icon"
         app:layout_constraintStart_toStartOf="parent"
@@ -195,4 +205,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtFavorites" />
+    <TextView
+        android:id="@+id/txtLogOut"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:drawablePadding="5dp"
+        android:text="@string/logout"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:drawableStartCompat="@drawable/logout_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtFavorites" />
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_marginStart="50dp"
+        android:background="@color/grey2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtLogOut" />
 </androidx.constraintlayout.widget.ConstraintLayout>

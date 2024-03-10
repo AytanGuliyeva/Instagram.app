@@ -24,7 +24,7 @@ class StartActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(binding.bottomNav, navController)
 
         navHostFragment.navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.loginFragment) {
+            if (destination.id == R.id.loginFragment || destination.id == R.id.signUpFragment) {
                 hideBottomNavigationView()
             } else {
                 showBottomNavigationView()

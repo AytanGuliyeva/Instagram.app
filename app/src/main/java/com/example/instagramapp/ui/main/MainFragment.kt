@@ -1,4 +1,4 @@
-package com.example.instagramapp.coreFeatures.main
+package com.example.instagramapp.ui.main
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

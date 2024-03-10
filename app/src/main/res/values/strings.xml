@@ -70,5 +70,9 @@
     <string name="orders_and_payments">Orders and payments</string>
     <string name="lists">Lists</string>
     <string name="favorites">Favorites</string>
+    <string name="logout">Logout</string>
+    <string name="log_out_of_your_account">Log out of your account?</string>
+    <string name="log_out">Log out</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

@@ -1,4 +1,4 @@
-package com.example.instagramapp.coreFeatures.profile
+package com.example.instagramapp.ui.profile
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -8,13 +8,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentProfileBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class ProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding
-    private lateinit var dialog: BottomSheetDialog
+    //private lateinit var dialog: BottomSheetDialog
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,25 +27,12 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-  //      btnMenu()
+        btnSettings()
     }
-//    private fun showBottomSheet() {
-//        val dialogView = layoutInflater.inflate(R.layout.bottom_sheet_settings,null)
-//        dialog = BottomSheetDialog(requireContext(), R.style.DialogAnimation)
-//        dialog.setContentView(dialogView)
-//
-//
-//        dialog.show()
-//        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT)
-//        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
-//        dialog.window?.setGravity(Gravity.BOTTOM)
-//    }
 
-
-//    private fun btnMenu(){
-//        binding.btnMenu.setOnClickListener {
-//            showBottomSheet()
-//        }
-//    }
+    private fun btnSettings(){
+        binding.btnMenu.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_settingFragment)
+        }
+    }
 }
