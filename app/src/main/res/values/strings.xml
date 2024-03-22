@@ -74,5 +74,15 @@
     <string name="log_out_of_your_account">Log out of your account?</string>
     <string name="log_out">Log out</string>
     <string name="cancel">Cancel</string>
+    <string name="imagepost">ImagePost</string>
+    <string name="write_a_caption_or_add_a_poll">Write a caption or add a poll...</string>
+    <string name="tag_people">Tag people</string>
+    <string name="add_reminder">Add reminder</string>
+    <string name="audience">Audience</string>
+    <string name="add_location">Add location</string>
+    <string name="caption">Caption</string>
+    <string name="follow">Follow</string>
+    <string name="message">Message</string>
+    <string name="camera">camera</string>
 
 </resources>

@@ -1,57 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.profile.ProfileFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.search.UserDetailFragment">
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/back_button"
+        android:background="@color/white"
+        android:padding="13dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/back" />
 
     <TextView
-        android:id="@+id/txtProfileName"
+        android:id="@+id/txtUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/username"
-        android:textSize="25sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <View
-        android:id="@+id/view"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:textSize="15sp"
+        android:text="@string/username"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtProfileName"/>
-
+        app:layout_constraintTop_toTopOf="@+id/btnBack"
+        app:layout_constraintBottom_toBottomOf="@+id/btnBack"
+        />
     <ImageButton
-        android:id="@+id/btnMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/option_icon"
         android:background="@color/white"
-        android:contentDescription="@string/menu"
-        android:padding="13dp"
-        android:src="@drawable/menu_icon"
-        app:layout_constraintBottom_toBottomOf="@+id/txtProfileName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="@+id/btnBack"
+        app:layout_constraintBottom_toBottomOf="@id/btnBack"
+        android:padding="13dp"
+        android:contentDescription="@string/back" />
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgProfile"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:layout_margin="10dp"
+        android:layout_margin="20dp"
         android:src="@drawable/profile_photo_default"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtProfileName" />
-    <TextView
-        android:id="@+id/txtUsername2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@+id/imgProfile"
-        app:layout_constraintStart_toStartOf="@+id/imgProfile"
-        android:text="@string/username"/>
+        app:layout_constraintTop_toBottomOf="@id/txtUsername" />
 
     <TextView
         android:id="@+id/txtPostCount"
@@ -121,44 +115,39 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/txtFollowers"
         app:layout_constraintTop_toTopOf="@+id/imgProfile" />
-
+    <TextView
+        android:id="@+id/txtUsername2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/imgProfile"
+        app:layout_constraintStart_toStartOf="@+id/imgProfile"
+        android:text="@string/username"/>
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnEditProfile"
+        android:id="@+id/btnFollow"
         android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_margin="15dp"
         android:background="@drawable/search_background"
-        android:backgroundTint="@color/grey2"
-        android:text="@string/edit_profile"
-        app:layout_constraintEnd_toStartOf="@+id/btnShareProfile"
+        android:backgroundTint="@color/blue2"
+        android:text="@string/follow"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toStartOf="@+id/btnMessage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtUsername2" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnShareProfile"
+        android:id="@+id/btnMessage"
         android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:layout_marginVertical="15dp"
-        android:background="@drawable/search_background"
-        android:backgroundTint="@color/grey2"
-        android:text="@string/share_profile"
-        app:layout_constraintEnd_toStartOf="@id/btnAddUser"
-        app:layout_constraintStart_toEndOf="@id/btnEditProfile"
-        app:layout_constraintTop_toBottomOf="@+id/txtUsername2" />
-
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/btnAddUser"
-        android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_margin="15dp"
         android:background="@drawable/search_background"
-        android:contentDescription="@string/add_user"
-        android:padding="13dp"
-        android:src="@drawable/add_user_icon"
-        app:layout_constraintBottom_toBottomOf="@+id/btnShareProfile"
+        android:backgroundTint="@color/blue2"
+        android:text="@string/message"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/btnShareProfile"
-        app:layout_constraintTop_toTopOf="@id/btnShareProfile" />
+        app:layout_constraintStart_toEndOf="@id/btnFollow"
+        app:layout_constraintTop_toBottomOf="@+id/txtUsername2" />
 
     <View
         android:id="@+id/viewProfile"
@@ -168,7 +157,7 @@
         android:background="@color/grey2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnShareProfile" />
+        app:layout_constraintTop_toBottomOf="@+id/btnMessage" />
 
     <ImageView
         android:id="@+id/imgCamera"
@@ -180,7 +169,8 @@
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/viewProfile"
-        app:layout_constraintVertical_bias="0.3" />
+        app:layout_constraintVertical_bias="0.3"
+        android:contentDescription="@string/camera" />
 
     <TextView
         android:id="@+id/txtNoPost"
@@ -205,5 +195,4 @@
         app:layout_constraintTop_toBottomOf="@+id/viewProfile"
         app:spanCount="3"
         tools:listitem="@layout/profile_post_item" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

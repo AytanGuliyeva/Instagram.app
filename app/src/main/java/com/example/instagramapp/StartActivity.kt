@@ -24,7 +24,7 @@ class StartActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(binding.bottomNav, navController)
 
         navHostFragment.navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.loginFragment || destination.id == R.id.signUpFragment) {
+            if (destination.id == R.id.loginFragment || destination.id == R.id.signUpFragment || destination.id == R.id.addImageFragment) {
                 hideBottomNavigationView()
             } else {
                 showBottomNavigationView()

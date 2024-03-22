@@ -75,6 +75,7 @@ class SignUpFragment : Fragment() {
      fun userAccount(username: String,password:String,email:String){
         val userId= auth.currentUser!!.uid
         val userMap = hashMapOf(
+            "userId" to userId,
             "username" to username,
             "email" to email,
             "password" to password,
