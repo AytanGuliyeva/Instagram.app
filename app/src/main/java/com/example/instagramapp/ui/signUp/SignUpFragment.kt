@@ -7,22 +7,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.instagramapp.R
-import com.example.instagramapp.databinding.BottomSheetSettingsBinding
 import com.example.instagramapp.databinding.FragmentSignUpBinding
-import com.google.firebase.Firebase
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
+import com.example.instagramapp.util.Resource
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import dagger.hilt.android.AndroidEntryPoint
 
 class SignUpFragment : Fragment() {
     private lateinit var binding: FragmentSignUpBinding
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db:FirebaseFirestore
-
+    private val viewModel: SignUpViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,63 +29,73 @@ class SignUpFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        auth = Firebase.auth
-        db = Firebase.firestore
-        btnSignUp()
+
+        setupViews()
+        observeViewModel()
     }
 
-    fun btnSignUp() {
+    private fun setupViews() {
         binding.btnSignUp.setOnClickListener {
             val username = binding.edtUsername.text.toString()
             val password = binding.edtPassword.text.toString()
             val email = binding.edtEmail.text.toString().trim()
+
             if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password) || TextUtils.isEmpty(
                     email
                 )
             ) {
                 Toast.makeText(requireContext(), "All fields are required", Toast.LENGTH_SHORT)
                     .show()
-
             } else if (password.length < 6) {
                 Toast.makeText(
                     requireContext(),
-                    "Password not have 6 characters",
+                    "Password must have at least 6 characters",
                     Toast.LENGTH_SHORT
                 ).show()
-
             } else {
-                auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener {
-                    Toast.makeText(
-                        requireContext(),
-                        "User created successfully.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    userAccount(username,password, email)
-                }.addOnFailureListener {
-                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                viewModel.signUp(username, email, password)
+            }
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.userCreated.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                }
+
+                is Resource.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
+                }
+
+                is Resource.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                    handleSignUpFailure(resource.exception)
                 }
             }
         }
     }
-     fun userAccount(username: String,password:String,email:String){
-        val userId= auth.currentUser!!.uid
-        val userMap = hashMapOf(
-            "userId" to userId,
-            "username" to username,
-            "email" to email,
-            "password" to password,
-            "bio" to "",
-            "imageUrl" to "https://firebasestorage.googleapis.com/v0/b/instagramclone-d83f1.appspot.com/o/photo_5393077931670099315_m.jpg?alt=media&token=929e8f56-74c9-4247-b1f6-173f858d9f04"
-        )
 
-        val refDb=db.collection("Users").document(userId)
-        refDb.set(userMap)
-            .addOnSuccessListener {
-                findNavController().navigate(R.id.action_signUpFragment_to_loginFragment)
+    private fun handleSignUpFailure(exception: Throwable) {
+        when (exception) {
+            is FirebaseAuthUserCollisionException -> {
+                Toast.makeText(
+                    requireContext(),
+                    "User with this email already exists",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-            .addOnFailureListener {
-                Toast.makeText(requireContext(),it.message,Toast.LENGTH_SHORT).show()
+
+            else -> {
+                Toast.makeText(
+                    requireContext(),
+                    "Sign up failed: ${exception.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
+        }
     }
-
 }
+

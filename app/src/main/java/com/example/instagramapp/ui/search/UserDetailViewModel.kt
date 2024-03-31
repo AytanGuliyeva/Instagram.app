@@ -187,8 +187,8 @@ class UserDetailViewModel : ViewModel() {
             .addOnSuccessListener { documentSnapshot ->
                 val follow = documentSnapshot.data
                 if (follow != null) {
-                    val following = follow["following"] as HashMap<*, *>
-                    _isFollowing.postValue(following.containsKey(userId))
+                    val following = follow["following"] as? HashMap<*, *>
+                    _isFollowing.postValue(following?.containsKey(userId) ?: false)
                 } else {
                     _isFollowing.postValue(false)
                 }
@@ -197,6 +197,7 @@ class UserDetailViewModel : ViewModel() {
                 Log.e("UserDetailViewModel", "Error getting follow data: $exception")
             }
     }
+
 
     private fun DocumentSnapshot.toUser(): Users? {
         return try {

@@ -53,13 +53,13 @@ class SettingFragment : BottomSheetDialogFragment(R.layout.bottom_sheet_settings
             btnLogout.setOnClickListener {
                 auth.signOut()
                 findNavController().navigate(R.id.action_settingFragment_to_loginFragment)
-                dialog.dismiss() // Dismiss the dialog after logging out
+                dialog.dismiss()
             }
             btnCancel.setOnClickListener {
                 dialog.dismiss()
             }
 
-            dialog.show() // Ensure the dialog is shown
+            dialog.show()
         }
     }
 }

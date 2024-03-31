@@ -15,14 +15,13 @@ import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentAddImageBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
-import java.security.Timestamp
-import java.util.UUID
 
 
 class AddImageFragment : Fragment() {
@@ -81,32 +80,36 @@ class AddImageFragment : Fragment() {
 
     private fun addProduct() {
         binding.btnShare.setOnClickListener {
+            binding.progressBar.visibility = View.VISIBLE
             val caption = binding.edtCaption.text.toString()
             val user = auth.currentUser!!.uid
 
             if (selectedImageBitmap != null) {
                 val time = com.google.firebase.Timestamp.now()
                 val ref = firestore.collection("Posts").document()
+                val postId = ref.id
+
                 val postMap = hashMapOf<String, Any>(
                     "caption" to caption,
                     "userId" to user,
                     "time" to time,
-                    "postId" to ref.id,
+                    "postId" to postId,
                 )
 
-                val postId = UUID.randomUUID().toString()
-                uploadImage(postId, postMap)
+                uploadImage(postId, postMap, ref)
             } else {
-                Toast.makeText(requireContext(), "Please select an image", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please select an image", Toast.LENGTH_SHORT)
+                    .show()
+                binding.progressBar.visibility = View.GONE
+
             }
         }
     }
 
-
-
     private fun uploadImage(
         postId: String,
-        postMap: HashMap<String, Any>
+        postMap: HashMap<String, Any>,
+        ref: DocumentReference
     ) {
         selectedImageBitmap?.let { bitmap ->
             val boas = ByteArrayOutputStream()
@@ -119,8 +122,8 @@ class AddImageFragment : Fragment() {
                     storageRef.downloadUrl.addOnSuccessListener { uri ->
                         val downloadUrl = uri.toString()
                         postMap["postImageUrl"] = downloadUrl
-                       postMap["time"] = com.google.firebase.Timestamp.now()
-                        addProductInfoToFireStore(postMap)
+                        postMap["time"] = com.google.firebase.Timestamp.now()
+                        addProductInfoToFireStore(postMap, ref)
                     }
                 }.addOnFailureListener {
                     Toast.makeText(requireContext(), "Failed to upload image!", Toast.LENGTH_SHORT)
@@ -129,8 +132,8 @@ class AddImageFragment : Fragment() {
         }
     }
 
-    private fun addProductInfoToFireStore(postMap: HashMap<String, Any>) {
-        firestore.collection("Posts").add(postMap)
+    private fun addProductInfoToFireStore(postMap: HashMap<String, Any>, ref: DocumentReference) {
+        ref.set(postMap)
             .addOnSuccessListener {
                 findNavController().navigate(R.id.action_addImageFragment_to_profileFragment)
             }.addOnFailureListener {

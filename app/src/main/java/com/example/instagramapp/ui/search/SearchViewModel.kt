@@ -9,7 +9,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import java.lang.NullPointerException
 
 class SearchViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
@@ -27,61 +26,62 @@ class SearchViewModel : ViewModel() {
         get() = _loading
 
     fun searchUsers(query: String) {
-        _loading.postValue(true)
+        _loading.value = true
         firestore.collection("Users")
             .orderBy("username")
             .startAt(query)
             .endAt(query + "\uf8ff")
             .get()
             .addOnSuccessListener { value ->
-                val userList = ArrayList<Users>()
+                val userList = mutableListOf<Users>()
                 for (user in value.documents) {
-                    val userId = user.get(ConstValues.USER_ID) as String
-                    val username = user.get(ConstValues.USERNAME) as String
-                    val email = user.get(ConstValues.EMAIL) as String
-                    val password = user.get(ConstValues.PASSWORD) as String
-                    val bio = user.get(ConstValues.BIO) as String
-                    val imageUrl = user.get(ConstValues.IMAGE_URL) as String
-                    val user = Users(userId, username, email, password, bio, imageUrl)
-                    if (Firebase.auth.currentUser?.uid != userId) userList.add(user)
-
+                    val userId = user.getString(ConstValues.USER_ID) ?: ""
+                    val username = user.getString(ConstValues.USERNAME) ?: ""
+                    val email = user.getString(ConstValues.EMAIL) ?: ""
+                    val password = user.getString(ConstValues.PASSWORD) ?: ""
+                    val bio = user.getString(ConstValues.BIO) ?: ""
+                    val imageUrl = user.getString(ConstValues.IMAGE_URL) ?: ""
+                    val currentUserUid = Firebase.auth.currentUser?.uid
+                    if (currentUserUid != userId) {
+                        val user = Users(userId, username, email, password, bio, imageUrl)
+                        userList.add(user)
+                    }
                 }
-                _userResult.postValue(Resource.Success(userList))
+                _userResult.value = Resource.Success(userList)
             }
             .addOnFailureListener { exception ->
-                _userResult.postValue(Resource.Error(exception))
+                _userResult.value = Resource.Error(exception)
             }
             .addOnCompleteListener {
-                _loading.postValue(false)
+                _loading.value = false
             }
     }
 
-
     fun fetchOtherUsersPosts(userId: String) {
+        _loading.value = true
         firestore.collection("Posts")
             .whereNotEqualTo("userId", userId)
             .get()
             .addOnSuccessListener { value ->
-                if (value != null) {
-                    val postList = ArrayList<Post>()
-                    val hashSet = hashSetOf<Post>()
-                    _postResult.postValue(Resource.Loading)
-                    for (post in value.documents) {
-                        val caption = post.get(ConstValues.CAPTION) as String
-                        val postId = post.get(ConstValues.POST_ID) as String
-                        val userId = post.get(ConstValues.USER_ID) as String
-                        val time = post.get(ConstValues.TIME) as Timestamp
-                        val imageUrl = post.get(ConstValues.POST_IMAGE_URL ) as String
-                        val post = Post(postId, caption, userId, time, imageUrl)
-                        hashSet.add(post)
-                    }
-                    postList.addAll(hashSet)
-                    _postResult.postValue(Resource.Success(postList))
+                val postList = mutableListOf<Post>()
+                val hashSet = hashSetOf<Post>()
+                for (post in value.documents) {
+                    val caption = post.getString(ConstValues.CAPTION) ?: ""
+                    val postId = post.getString(ConstValues.POST_ID) ?: ""
+                    val userId = post.getString(ConstValues.USER_ID) ?: ""
+                    val time = post.getTimestamp(ConstValues.TIME)
+                    val imageUrl = post.getString(ConstValues.POST_IMAGE_URL) ?: ""
+                    val post = Post(postId, caption, userId, time, imageUrl)
+                    hashSet.add(post)
                 }
+                postList.addAll(hashSet)
+                _postResult.value = Resource.Success(postList)
             }
             .addOnFailureListener { exception ->
-                _postResult.postValue(Resource.Error(exception))
+                _postResult.value = Resource.Error(exception)
+            }
+            .addOnCompleteListener {
+                _loading.value = false
             }
     }
-
 }

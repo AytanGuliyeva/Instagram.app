@@ -6,18 +6,18 @@ import com.example.instagramapp.ConstValues
 import com.example.instagramapp.ui.search.model.Users
 import com.example.instagramapp.util.Resource
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
-class ProfileViewModel : ViewModel() {
+class ProfileViewModel: ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = Firebase.auth.currentUser!!.uid
-
-
     private val _postResult = MutableLiveData<Resource<List<Post>>>()
     val postResult: LiveData<Resource<List<Post>>>
         get() = _postResult

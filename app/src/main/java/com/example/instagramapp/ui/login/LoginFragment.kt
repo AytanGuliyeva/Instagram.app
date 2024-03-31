@@ -39,11 +39,14 @@ class LoginFragment : Fragment() {
             val username = binding.edtUsername.text.toString()
             val password = binding.edtPassword.text.toString()
             if (username.isNotEmpty() && password.isNotEmpty()) {
+                binding.progressBar.visibility = View.VISIBLE
                 auth.signInWithEmailAndPassword(
                     username,password
                 ).addOnSuccessListener {
+                    binding.progressBar.visibility = View.GONE
                     findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
                 }.addOnFailureListener {
+                    binding.progressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                 }
             } else {

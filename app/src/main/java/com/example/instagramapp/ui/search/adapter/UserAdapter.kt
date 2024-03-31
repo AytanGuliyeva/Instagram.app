@@ -15,7 +15,6 @@ class UserAdapter(
     private var itemClick: (item: Users) -> Unit
 ):RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
     private val diffUtilCallBack = object : DiffUtil.ItemCallback<Users>() {
-        var onItemClick : ((Users) -> Unit)? =null
         override fun areItemsTheSame(oldItem: Users, newItem: Users): Boolean {
             return oldItem.userId == newItem.userId
         }

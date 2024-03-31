@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.instagramapp.databinding.ActivityStartBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 class StartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityStartBinding
@@ -31,6 +33,8 @@ class StartActivity : AppCompatActivity() {
             }
         }
     }
+
+
 
     fun hideBottomNavigationView() {
         binding.bottomNav.visibility = View.GONE

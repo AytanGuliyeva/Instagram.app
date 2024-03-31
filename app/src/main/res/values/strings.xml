@@ -84,5 +84,6 @@
     <string name="follow">Follow</string>
     <string name="message">Message</string>
     <string name="camera">camera</string>
+    <string name="follows">Follows</string>
 
 </resources>

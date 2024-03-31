@@ -1,5 +1,6 @@
 package com.example.instagramapp.ui.profile
 
+import Post
 import ProfileViewModel
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentProfileBinding
 import com.example.instagramapp.ui.profile.adapter.PostAdapter
+import com.example.instagramapp.ui.search.SearchFragmentDirections
 import com.example.instagramapp.ui.search.model.Users
 import com.example.instagramapp.util.Resource
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -30,6 +32,9 @@ class ProfileFragment : Fragment() {
     private lateinit var postAdapter: PostAdapter
     private val auth = Firebase.auth.currentUser!!.uid
     private val viewModel: ProfileViewModel by viewModels()
+    private var selectedPost: Post? = null
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,25 +48,32 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         btnSettings()
         setupRecyclerView()
+        follow()
         viewModel.fetchUserInformation()
+
 
         viewModel.postResult.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    if (resource.data.isEmpty()){
+                    if (resource.data.isEmpty()) {
                         binding.txtNoPost.visibility = View.VISIBLE
-                        binding.imgCamera.visibility=View.VISIBLE
+                        binding.imgCamera.visibility = View.VISIBLE
                     } else {
                         binding.txtNoPost.visibility = View.GONE
-                        binding.imgCamera.visibility=View.GONE
+                        binding.imgCamera.visibility = View.GONE
                     }
                     postAdapter.submitList(resource.data)
+                    binding.progressBar.visibility = View.GONE
                 }
+
                 is Resource.Error -> {
+                    binding.progressBar.visibility = View.GONE
+
                     Toast.makeText(requireContext(), "Error occurred!", Toast.LENGTH_SHORT).show()
                 }
+
                 is Resource.Loading -> {
-                    //progress
+                    binding.progressBar.visibility = View.VISIBLE
                 }
             }
         }
@@ -77,20 +89,36 @@ class ProfileFragment : Fragment() {
 
         viewModel.userInformation.observe(viewLifecycleOwner) { userResource ->
             when (userResource) {
-                is Resource.Success -> updateUserUI(userResource.data)
-                is Resource.Error -> {
-                    // Handle error
+                is Resource.Success -> {
+                    updateUserUI(userResource.data)
+                    binding.progressBar.visibility = View.GONE
+
                 }
+
+                is Resource.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                }
+
                 is Resource.Loading -> {
-                    // Handle loading
+                    binding.progressBar.visibility = View.VISIBLE
                 }
             }
         }
     }
 
     private fun setupRecyclerView() {
-        postAdapter = PostAdapter()
+        postAdapter = PostAdapter(itemClick = {
+            selectedPost = it;postDetail(selectedPost!!.postId, selectedPost!!.userId)
+        })
         binding.rvPost.adapter = postAdapter
+    }
+
+    fun postDetail(postId: String, userId: String) {
+        if (selectedPost != null) {
+            val action =
+                ProfileFragmentDirections.actionProfileFragmentToPostDetailFragment(postId, userId)
+            findNavController().navigate(action)
+        }
     }
 
     private fun btnSettings() {
@@ -100,7 +128,19 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateUserUI(user: Users) {
-        binding.txtUsername2.text=user.bio
-        binding.txtProfileName.text=user.username
+        binding.txtUsername2.text = user.bio
+        binding.txtProfileName.text = user.username
+    }
+
+
+    private fun follow(){
+        binding.txtFollowingCount.setOnClickListener {
+            val action = ProfileFragmentDirections.actionProfileFragmentToFollowFragment(auth)
+            findNavController().navigate(action)
+        }
+        binding.txtFollowersCount.setOnClickListener {
+            val action = ProfileFragmentDirections.actionProfileFragmentToFollowFragment(auth)
+            findNavController().navigate(action)
+        }
     }
 }
