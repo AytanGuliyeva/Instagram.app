@@ -40,7 +40,7 @@
     <string name="agree_to_instagram_s_terms_and_policies">Agree to Instagram\'s terms and policies</string>
     <string name="i_agree">I agree</string>
     <string name="sign_up">Sign Up</string>
-    <string name="like">like</string>
+    <string name="like">0 like</string>
     <string name="dm">dm</string>
     <string name="story">story</string>
     <string name="main">main</string>
@@ -85,5 +85,7 @@
     <string name="message">Message</string>
     <string name="camera">camera</string>
     <string name="follows">Follows</string>
+    <string name="view_all_0_comments">View all 0 comments</string>
+    <string name="_0_hours_ago">0 hours ago</string>
 
 </resources>

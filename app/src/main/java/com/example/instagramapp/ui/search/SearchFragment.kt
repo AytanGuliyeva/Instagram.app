@@ -80,7 +80,7 @@ class SearchFragment : Fragment() {
 
     private fun observeUserResult() {
         viewModel.userResult.observe(viewLifecycleOwner) { resource ->
-            when (resource) {
+                   when (resource) {
                 is Resource.Success<List<Users>> -> {
                     userAdapter.submitList(resource.data)
                     binding.rvUsername.visibility = View.VISIBLE

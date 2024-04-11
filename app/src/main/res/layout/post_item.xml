@@ -15,11 +15,11 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:padding="5dp"
-            app:srcCompat="@string/profile"
             android:src="@drawable/profile_icon"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/circle" />
+            app:shapeAppearanceOverlay="@style/circle"
+            app:srcCompat="@string/profile" />
 
         <TextView
             android:id="@+id/txtUsername"
@@ -49,19 +49,19 @@
             android:id="@+id/imgPost"
             android:layout_width="match_parent"
             android:layout_height="480dp"
-            app:srcCompat="@drawable/ic_launcher_background"
             android:contentDescription="@string/post"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imgProfile" />
+            app:layout_constraintTop_toBottomOf="@id/imgProfile"
+            app:srcCompat="@drawable/ic_launcher_background" />
 
         <ImageButton
             android:id="@+id/btnLike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:background="@color/white"
             android:contentDescription="@string/like"
-            android:padding="13dp"
             android:src="@drawable/like_icon"
             app:layout_constraintBottom_toBottomOf="@+id/btnComment"
             app:layout_constraintEnd_toStartOf="@+id/btnComment"
@@ -72,9 +72,9 @@
             android:id="@+id/btnComment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
             android:background="@color/white"
             android:contentDescription="@string/comment"
-            android:padding="13dp"
             android:src="@drawable/comment_icon"
             app:layout_constraintEnd_toStartOf="@+id/btnShare"
             app:layout_constraintStart_toEndOf="@+id/btnLike"
@@ -84,9 +84,9 @@
             android:id="@+id/btnShare"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:background="@color/white"
             android:contentDescription="@string/share"
-            android:padding="13dp"
             android:src="@drawable/share_icon"
             app:layout_constraintBottom_toBottomOf="@+id/btnComment"
             app:layout_constraintStart_toEndOf="@+id/btnComment"
@@ -100,7 +100,6 @@
             android:contentDescription="@string/saved"
             android:padding="13dp"
             android:src="@drawable/saved_icon"
-            app:layout_constraintBottom_toBottomOf="@+id/btnComment"
             app:layout_constraintEnd_toEndOf="@id/imgPost"
             app:layout_constraintTop_toBottomOf="@id/imgPost" />
 
@@ -114,27 +113,48 @@
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@id/btnLike"
-            app:layout_constraintTop_toBottomOf="@id/btnLike"
-            />
+            app:layout_constraintTop_toBottomOf="@id/btnLike" />
+
         <TextView
             android:id="@+id/txtUsername2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:layout_marginStart="5dp"
             android:text="@string/username"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@+id/txtLikes"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="5dp"/>
+            app:layout_constraintTop_toBottomOf="@+id/txtLikes" />
+
         <TextView
             android:id="@+id/txtCaption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@+id/txtUsername2"
-            app:layout_constraintTop_toBottomOf="@+id/txtLikes"
+            android:layout_margin="5dp"
             android:text="@string/caption"
-            android:layout_margin="5dp"/>
+            app:layout_constraintStart_toEndOf="@+id/txtUsername2"
+            app:layout_constraintTop_toBottomOf="@+id/txtLikes" />
 
+        <TextView
+            android:id="@+id/txtComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_marginStart="5dp"
+            android:hint="@string/view_all_0_comments"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtUsername2" />
+
+        <TextView
+            android:id="@+id/txtTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:hint="@string/_0_hours_ago"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtComment" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

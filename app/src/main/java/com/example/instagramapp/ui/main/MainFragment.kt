@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
@@ -45,25 +46,34 @@ class MainFragment : Fragment() {
                     binding.progressBar.visibility = View.VISIBLE
                 }
                 is Resource.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    val posts = resource.data
-                    val postWithUsernames = mutableListOf<Pair<Post, String>>()
-                    posts.forEach { post ->
-                        viewModel.fetchUsername(post.userId) { username ->
-                            postWithUsernames.add(Pair(post, username))
-                            if (postWithUsernames.size == posts.size) {
-                                postAdapter.submitList(postWithUsernames)
+                    if (resource.data.isEmpty()) {
+                        binding.txtNoPost.visibility = View.VISIBLE
+                        binding.imgCamera.visibility = View.VISIBLE
+                        binding.progressBar.visibility = View.GONE
+                    } else {
+                        binding.txtNoPost.visibility = View.GONE
+                        binding.imgCamera.visibility = View.GONE
+                        val posts = resource.data
+                        val postWithUsernames = mutableListOf<Pair<Post, String>>()
+                        posts.forEach { post ->
+                            viewModel.fetchUsername(post.userId) { username ->
+                                postWithUsernames.add(Pair(post, username))
+                                if (postWithUsernames.size == posts.size) {
+                                    postAdapter.submitList(postWithUsernames)
+                                    binding.progressBar.visibility = View.GONE
+                                }
                             }
                         }
                     }
                 }
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
-                    // Handle error state if needed
+                    Toast.makeText(requireContext(), "Error occurred!", Toast.LENGTH_SHORT).show()
                 }
             }
         })
     }
+
 
     private fun setupRecyclerView() {
         postAdapter = PostSearchAdapter(itemClick = {
@@ -71,6 +81,7 @@ class MainFragment : Fragment() {
         })
         binding.rvPost.adapter = postAdapter
     }
+
 
 
 }

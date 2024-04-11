@@ -42,6 +42,10 @@ class UserDetailViewModel : ViewModel() {
     val followingCount: LiveData<Int>
         get() = _followingCount
 
+    private val _postSize = MutableLiveData<Int>()
+    val postSize: LiveData<Int>
+        get() = _postSize
+
     private val _loading = MutableLiveData<Boolean>()
     val loading: LiveData<Boolean>
         get() = _loading
@@ -54,6 +58,7 @@ class UserDetailViewModel : ViewModel() {
         _isFollowing.value = false
     }
 
+/*
     fun fetchPosts(userId: String) {
         _loading.postValue(true)
         firestore.collection("Posts").get()
@@ -74,7 +79,32 @@ class UserDetailViewModel : ViewModel() {
                 Log.e(TAG, "Failed! ${exception.message}", exception)
             }
     }
+*/
 
+
+    fun fetchPosts(userId: String) {
+        _loading.postValue(true)
+        firestore.collection("Posts").get()
+            .addOnSuccessListener { querySnapshot ->
+                val postList = mutableListOf<Post>()
+                for (document in querySnapshot.documents) {
+                    val post = document.toObject(Post::class.java)
+                    post?.let {
+                        if (userId == it.userId) {
+                            val timestamp = it.time
+                            val postWithTimestamp = it.copy(time = timestamp)
+                            postList.add(postWithTimestamp)
+                        }
+                    }
+                }
+                _postResult.postValue(Resource.Success(postList))
+                _postSize.postValue(postList.size)
+
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "Failed! ${exception.message}", exception)
+            }
+    }
 
     fun fetchFollowersCount(userId: String) {
         firestore.collection("Follow").document(userId)

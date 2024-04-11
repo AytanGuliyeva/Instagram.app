@@ -42,25 +42,30 @@ class MainViewModel : ViewModel() {
                     val followData = documentSnapshot.data
                     if (followData != null) {
                         val followingUserIds = (followData["following"] as? Map<String, Boolean>)?.keys ?: emptySet()
-                        firestore.collection("Posts")
-                            .whereIn("userId", followingUserIds.toList())
-                            .get()
-                            .addOnSuccessListener { querySnapshot ->
-                                val postList = mutableListOf<Post>()
-                                val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-                                for (document in querySnapshot.documents) {
-                                    val post = document.toObject(Post::class.java)
-                                    post?.let {
-                                        val formattedTimestamp = dateFormat.format(post.time!!.toDate())
-                                        val postWithFormattedTime = post.copy(time = Timestamp(Date(formattedTimestamp)))
-                                        postList.add(postWithFormattedTime)
+                        if (followingUserIds.isNotEmpty()) {
+                            firestore.collection("Posts")
+                                .whereIn("userId", followingUserIds.toList())
+                                .get()
+                                .addOnSuccessListener { querySnapshot ->
+                                    val postList = mutableListOf<Post>()
+                                    val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+                                    for (document in querySnapshot.documents) {
+                                        val post = document.toObject(Post::class.java)
+                                        post?.let {
+                                            val formattedTimestamp = dateFormat.format(post.time!!.toDate())
+                                            val postWithFormattedTime = post.copy(time = Timestamp(Date(formattedTimestamp)))
+                                            postList.add(postWithFormattedTime)
+                                        }
                                     }
+                                    _postResult.postValue(Resource.Success(postList))
                                 }
-                                _postResult.postValue(Resource.Success(postList))
-                            }
-                            .addOnFailureListener { exception ->
-                                _postResult.postValue(Resource.Error(Exception("Failed to fetch posts")))
-                            }
+                                .addOnFailureListener { exception ->
+                                    _postResult.postValue(Resource.Error(Exception("Failed to fetch posts")))
+                                }
+                        } else {
+                            // No users followed by the current user, post empty list as success
+                            _postResult.postValue(Resource.Success(emptyList()))
+                        }
                     } else {
                         _postResult.postValue(Resource.Error(Exception("Failed to fetch follow data")))
                     }
@@ -72,6 +77,7 @@ class MainViewModel : ViewModel() {
             _postResult.postValue(Resource.Error(Exception("User not logged in")))
         }
     }
+
     fun fetchUsername(userId: String, callback: (String) -> Unit) {
         firestore.collection("Users")
             .document(userId)
@@ -83,7 +89,7 @@ class MainViewModel : ViewModel() {
             }
             .addOnFailureListener { exception ->
                 Log.e(TAG, "Failed to fetch username: ${exception.message}", exception)
-                callback("") // Return an empty string if there's an error
+                callback("")
             }
     }
 

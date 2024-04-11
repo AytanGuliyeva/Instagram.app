@@ -83,6 +83,9 @@ class UserDetailFragment : Fragment() {
                 }
             }
         }
+        viewModel.postSize.observe(viewLifecycleOwner){ postCount ->
+            binding.txtPostCount.text = postCount.toString()
+        }
         btnFollow()
         btnBack()
     }

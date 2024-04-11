@@ -5,15 +5,10 @@ import androidx.lifecycle.ViewModel
 import com.example.instagramapp.ConstValues
 import com.example.instagramapp.ui.search.model.Users
 import com.example.instagramapp.util.Resource
-import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import java.text.SimpleDateFormat
-import java.util.*
-import javax.inject.Inject
 
 class ProfileViewModel: ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
@@ -37,10 +32,15 @@ class ProfileViewModel: ViewModel() {
     val userInformation: LiveData<Resource<Users>>
         get() = _userInformation
 
+    private val _postSize = MutableLiveData<Int>()
+    val postSize: LiveData<Int>
+        get() = _postSize
+
     init {
         fetchFollowersCount()
         fetchFollowingCount()
     }
+
     fun fetchUserInformation() {
         _userInformation.postValue(Resource.Loading)
         firestore.collection("Users")
@@ -62,6 +62,7 @@ class ProfileViewModel: ViewModel() {
                 _userInformation.postValue(Resource.Error(exception))
             }
     }
+
     private fun DocumentSnapshot.toUser(): Users? {
         return try {
             val userId = getString(ConstValues.USER_ID)
@@ -83,6 +84,7 @@ class ProfileViewModel: ViewModel() {
             null
         }
     }
+
     private fun fetchFollowersCount() {
         firestore.collection("Follow").document(auth)
             .get()
@@ -96,7 +98,7 @@ class ProfileViewModel: ViewModel() {
                 }
             }
             .addOnFailureListener { exception ->
-                Log.e("UserDetailViewModel", "Error getting followers count: $exception")
+                Log.e("ProfileViewModel", "Error getting followers count: $exception")
             }
     }
 
@@ -113,27 +115,27 @@ class ProfileViewModel: ViewModel() {
                 }
             }
             .addOnFailureListener { exception ->
-                Log.e("UserDetailViewModel", "Error getting following count: $exception")
+                Log.e("ProfileViewModel", "Error getting following count: $exception")
             }
     }
-
-
 
     fun fetchPosts() {
         _loading.postValue(true)
         firestore.collection("Posts").get()
             .addOnSuccessListener { querySnapshot ->
                 val postList = mutableListOf<Post>()
-                val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
                 for (document in querySnapshot.documents) {
                     val post = document.toObject(Post::class.java)
                     post?.let {
-                        val formattedTimestamp = dateFormat.format(post.time!!.toDate())
-                        val postWithFormattedTime = post.copy(time = Timestamp(Date(formattedTimestamp)))
-                        if (Firebase.auth.currentUser?.uid==it.userId) postList.add(postWithFormattedTime)
+                        if (Firebase.auth.currentUser?.uid == it.userId) {
+                            val timestamp = it.time
+                            val postWithTimestamp = it.copy(time = timestamp)
+                            postList.add(postWithTimestamp)
+                        }
                     }
                 }
                 _postResult.postValue(Resource.Success(postList))
+                _postSize.postValue(postList.size)
             }
             .addOnFailureListener { exception ->
                 Log.e(TAG, "Failed! ${exception.message}", exception)

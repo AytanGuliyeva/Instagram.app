@@ -50,6 +50,8 @@ class ProfileFragment : Fragment() {
         setupRecyclerView()
         follow()
         viewModel.fetchUserInformation()
+        viewModel.fetchPosts()
+
 
 
         viewModel.postResult.observe(viewLifecycleOwner) { resource ->
@@ -77,7 +79,9 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
-        viewModel.fetchPosts()
+        viewModel.postSize.observe(viewLifecycleOwner){ postCount ->
+            binding.txtPostCount.text = postCount.toString()
+        }
 
         viewModel.followersCount.observe(viewLifecycleOwner) { followersCount ->
             binding.txtFollowersCount.text = followersCount.toString()

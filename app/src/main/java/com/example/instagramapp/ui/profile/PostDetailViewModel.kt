@@ -2,6 +2,7 @@ package com.example.instagramapp.ui.profile
 
 import Post
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -46,9 +47,12 @@ class PostDetailViewModel : ViewModel() {
 
     fun fetchPosts(postId: String) {
         _loading.postValue(true)
-        firestore.collection("Posts").document(postId)
-            .get()
+        val postDocumentRef = firestore.collection("Posts").document(postId)
+        Log.d(TAG, "Fetching post with postId: $postId")
+
+        postDocumentRef.get()
             .addOnSuccessListener { documentSnapshot ->
+                Log.d(TAG, "Post fetch success")
                 val post = documentSnapshot.toObject(Post::class.java)
                 if (post != null) {
                     _postResult.postValue(Resource.Success(post))
@@ -58,10 +62,12 @@ class PostDetailViewModel : ViewModel() {
                 _loading.postValue(false)
             }
             .addOnFailureListener { exception ->
+                Log.e(TAG, "Post fetch failure: ${exception.message}")
                 _postResult.postValue(Resource.Error(exception))
                 _loading.postValue(false)
             }
     }
+
     fun fetchUserInformation(userId:String) {
         _userInformation.postValue(Resource.Loading)
         firestore.collection("Users")
