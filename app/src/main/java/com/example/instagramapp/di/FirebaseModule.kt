@@ -15,13 +15,14 @@
 //
 //@Module
 //@InstallIn(SingletonComponent::class)
-//object FirebaseModule {
+//object FireBaseModule {
 //
 //    @Provides
 //    @Singleton
 //    fun provideFirebase(): Firebase {
 //        return Firebase
 //    }
+//
 //    @Provides
 //    @Singleton
 //    fun provideFirebaseAuth(firebase: Firebase): FirebaseAuth {
@@ -30,13 +31,13 @@
 //
 //    @Provides
 //    @Singleton
-//    fun provideFirebaseFirestore(firebase: Firebase): FirebaseFirestore {
+//    fun provideFirebaseStore(firebase: Firebase): FirebaseFirestore {
 //        return firebase.firestore
 //    }
-//
 //    @Provides
 //    @Singleton
-//    fun provideFirebaseStorage(firebase: Firebase): FirebaseStorage {
+//    fun provideFireBaseStorage(firebase: Firebase): FirebaseStorage {
 //        return firebase.storage
 //    }
+//
 //}

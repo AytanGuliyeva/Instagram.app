@@ -1,6 +1,7 @@
 package com.example.instagramapp.ui.profile
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -29,6 +30,8 @@ class FollowFragment : Fragment() {
     val args: FollowFragmentArgs by navArgs()
     var tabTitle = arrayOf("Followers", "Following")
 
+    private lateinit var followerFragment: FollowerFragment
+    private lateinit var followingFragment: FollowingFragment
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,10 +40,28 @@ class FollowFragment : Fragment() {
         return binding.root
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val userId = args.userId
+
+        followerFragment=FollowerFragment()
+        followingFragment=FollowingFragment()
+        val followerArgs = Bundle().also {
+            it.putString("userId", userId)
+        }
+        fragmentList.add(followerFragment.also {
+            it.arguments = followerArgs
+        })
+
+        fragmentList.add(followingFragment.also {
+            it.arguments = followerArgs
+        })
+        Log.e("TAG", "onCreate: $userId", )
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = PagerAdapter(childFragmentManager, lifecycle)
+        val adapter = PagerAdapter(childFragmentManager, lifecycle,followerFragment,followingFragment)
         binding.viewPager.adapter = adapter
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
@@ -59,21 +80,7 @@ class FollowFragment : Fragment() {
 //        viewModel.fetchFollowing(args.userId)
 //        observeFollowers()
 //        observeFollowings()
-        val userId = args?.userId ?: ""
 
-        val followerArgs = Bundle().also {
-            it.putString("userId", userId)
-        }
-        fragmentList.add(FollowerFragment().also {
-            it.arguments = followerArgs
-        })
-
-        val followingArgs = Bundle().also {
-            it.putString("userId", userId)
-        }
-        fragmentList.add(FollowingFragment().also {
-            it.arguments = followingArgs
-        })
 
 
 

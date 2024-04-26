@@ -43,7 +43,7 @@ class SettingFragment : BottomSheetDialogFragment(R.layout.bottom_sheet_settings
         binding.txtLogOut.setOnClickListener {
             val dialog = Dialog(requireContext())
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            dialog.setCancelable(false)
+            dialog.setCancelable(true)
             dialog.setContentView(R.layout.logout_dialog)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 

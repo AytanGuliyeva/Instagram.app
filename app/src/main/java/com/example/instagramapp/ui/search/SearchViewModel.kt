@@ -100,26 +100,29 @@ fun fetchOtherUsersPosts(userId: String) {
     viewModelScope.launch(Dispatchers.IO) {
         _loading.postValue(true)
         try {
-            val isFollowing = checkIsFollowing(userId)
-            if (!isFollowing) {
                 val postList = mutableListOf<Post>()
                 val currentUserUid = Firebase.auth.currentUser?.uid
-                val value = firestore.collection("Posts")
-                    .whereNotEqualTo("userId", userId)
-                    .get()
-                    .await()
+                val value = firestore.collection("Posts").get()
+                    .addOnSuccessListener {
 
-                for (postDoc in value.documents) {
-                    val postUserId = postDoc.getString(ConstValues.USER_ID) ?: ""
-                    if (currentUserUid != null && !checkIsFollowing(postUserId)) {
-                        val caption = postDoc.getString(ConstValues.CAPTION) ?: ""
-                        val postId = postDoc.getString(ConstValues.POST_ID) ?: ""
-                        val time = postDoc.getTimestamp(ConstValues.TIME)
-                        val imageUrl = postDoc.getString(ConstValues.POST_IMAGE_URL) ?: ""
-                        val post = Post(postId, caption, postUserId, time, imageUrl)
-                        postList.add(post)
-                    }
-                }
+                        for (postDoc in it.documents) {
+                            val postUserId = postDoc.getString(ConstValues.USER_ID) ?: ""
+                            if (currentUserUid != null ) {
+                                val caption = postDoc.getString(ConstValues.CAPTION) ?: ""
+                                val postId = postDoc.getString(ConstValues.POST_ID) ?: ""
+                                val time = postDoc.getTimestamp(ConstValues.TIME)
+                                val imageUrl = postDoc.getString(ConstValues.POST_IMAGE_URL) ?: ""
+                                val post = Post(caption,postId, postUserId, time, imageUrl)
+
+                                if (postUserId!=currentUserUid)   postList.add(post)
+                            }
+                        }
+
+//                    .whereNotEqualTo("userId", userId)
+//                    .get()
+//                    .await()
+
+
                 _postResult.postValue(Resource.Success(postList))
             }
         } catch (exception: Exception) {
@@ -130,18 +133,18 @@ fun fetchOtherUsersPosts(userId: String) {
     }
 }
 
-    suspend fun checkIsFollowing(userId: String): Boolean {
-        var isFollowing = false
-        try {
-            val documentSnapshot = firestore.collection("Follow").document(auth).get().await()
-            val follow = documentSnapshot.data
-            if (follow != null) {
-                val following = follow["following"] as? HashMap<*, *>
-                isFollowing = following?.containsKey(userId) ?: false
-            }
-        } catch (e: Exception) {
-            Log.e("UserDetailViewModel", "Error getting follow data: $e")
-        }
-        return isFollowing
-    }
+//    suspend fun checkIsFollowing(userId: String): Boolean {
+//        var isFollowing = false
+//        try {
+//            val documentSnapshot = firestore.collection("Follow").document(auth).get().await()
+//            val follow = documentSnapshot.data
+//            if (follow != null) {
+//                val following = follow["following"] as? HashMap<*, *>
+//                isFollowing = following?.containsKey(userId) ?: false
+//            }
+//        } catch (e: Exception) {
+//            Log.e("UserDetailViewModel", "Error getting follow data: $e")
+//        }
+//        return isFollowing
+//    }
 }

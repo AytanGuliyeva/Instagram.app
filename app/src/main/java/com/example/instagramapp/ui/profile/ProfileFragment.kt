@@ -112,8 +112,8 @@ class ProfileFragment : Fragment() {
 
     private fun setupRecyclerView() {
         postAdapter = PostAdapter(itemClick = {
-            selectedPost = it;postDetail(selectedPost!!.postId, selectedPost!!.userId)
-        })
+            selectedPost = it
+            postDetail(selectedPost!!.postId, selectedPost!!.userId)})
         binding.rvPost.adapter = postAdapter
     }
 

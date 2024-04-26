@@ -9,7 +9,7 @@
         android:id="@+id/imgPost"
         android:layout_width="161dp"
         android:layout_height="161dp"
-        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
         android:layout_margin="4dp"
         android:src="@mipmap/ic_launcher"
         app:layout_constraintStart_toStartOf="parent"

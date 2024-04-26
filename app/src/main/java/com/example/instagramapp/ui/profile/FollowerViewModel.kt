@@ -31,6 +31,7 @@ class FollowerViewModel : ViewModel() {
                 if (follow != null) {
                     val followersMap = follow["followers"] as? HashMap<String, Boolean>
                     val followersIds = followersMap?.keys?.toList() ?: emptyList()
+                    Log.e("TAG", "fetchFollowers: ${followersIds.toString()}", )
 
                     fetchUserDetails(followersIds)
                 } else {

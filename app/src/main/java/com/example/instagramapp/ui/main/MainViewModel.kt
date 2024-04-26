@@ -52,9 +52,19 @@ class MainViewModel : ViewModel() {
                                     for (document in querySnapshot.documents) {
                                         val post = document.toObject(Post::class.java)
                                         post?.let {
-                                            val formattedTimestamp = dateFormat.format(post.time!!.toDate())
-                                            val postWithFormattedTime = post.copy(time = Timestamp(Date(formattedTimestamp)))
-                                            postList.add(postWithFormattedTime)
+                                           // val formattedTimestamp = post.time
+
+//                                            val formattedTimestamp = dateFormat.format(post.time!!.toDate())
+//                                            val postWithFormattedTime = post.copy(time = Timestamp(Date(formattedTimestamp)))
+//                                            postList.add(postWithFormattedTime)
+                                            val formattedTimestamp = post.time?.toDate()
+                                            if (formattedTimestamp != null) {
+                                                val postWithFormattedTime = post.copy(time = Timestamp(formattedTimestamp))
+                                                postList.add(postWithFormattedTime)
+                                            } else {
+                                                // Handle the case where post.time is null
+                                            }
+
                                         }
                                     }
                                     _postResult.postValue(Resource.Success(postList))
