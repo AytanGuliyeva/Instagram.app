@@ -87,5 +87,13 @@
     <string name="follows">Follows</string>
     <string name="view_all_0_comments">View all 0 comments</string>
     <string name="_0_hours_ago">0 hours ago</string>
+    <string name="edit_picture">Edit picture</string>
+    <string name="bio">Bio</string>
+    <string name="pronouns">Pronouns</string>
+    <string name="links">Links</string>
+    <string name="switch_to_professional_account">Switch to professional account</string>
+    <string name="personal_information_settings">Personal information settings</string>
+    <string name="sign_up_for_meta_verified">Sign up for Meta Verified</string>
+    <string name="done">Done</string>
 
 </resources>

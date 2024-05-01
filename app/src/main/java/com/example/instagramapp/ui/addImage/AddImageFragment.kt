@@ -46,7 +46,7 @@ class AddImageFragment : Fragment() {
         auth = Firebase.auth
         firestore = Firebase.firestore
         storage = Firebase.storage
-        addProduct()
+        addImage()
         selectedImage()
         btnBack()
     }
@@ -78,7 +78,7 @@ class AddImageFragment : Fragment() {
     }
 
 
-    private fun addProduct() {
+    private fun addImage() {
         binding.btnShare.setOnClickListener {
             binding.progressBar.visibility = View.VISIBLE
             val caption = binding.edtCaption.text.toString()

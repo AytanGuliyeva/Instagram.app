@@ -97,6 +97,9 @@ class PostDetailFragment : Fragment() {
     private fun updateUserUI(user: Users) {
         binding.txtUsername2.text = user.username
         binding.txtUsername.text = user.username
+        Glide.with(binding.root)
+            .load(user.imageUrl)
+            .into(binding.imgProfile)
 
     }
     private fun updatePostUI(post: Post) {

@@ -12,7 +12,7 @@
         android:layout_width="161dp"
         android:layout_height="161dp"
         android:layout_margin="1dp"
-        android:src="@mipmap/ic_launcher"
+        android:src="@mipmap/ic_launcher_round"
         android:contentDescription="@string/post" />
 
 </androidx.cardview.widget.CardView>

@@ -28,6 +28,7 @@ class PostSearchAdapter(
     private val itemClick: (item: Post) -> Unit
 ) : RecyclerView.Adapter<PostSearchAdapter.PostViewHolder>() {
 
+
     private var postWithUsernames: List<Pair<Post, String>> = emptyList()
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -61,6 +62,11 @@ class PostSearchAdapter(
             binding.txtUsername2.text = username
             binding.txtUsername.text = username
             binding.txtCaption.text = post.caption
+           // getProfile(username)
+
+       //     fetchUserProfile(username)
+            fetchUserProfile(username)
+
             val timestamp = post.time?.toDate()
 
             timestamp?.let {
@@ -115,6 +121,11 @@ class PostSearchAdapter(
                 addLikeToFirestore(postId)
             }
         }
+//        private fun getProfile(users: Users){
+//            Glide.with(binding.root)
+//                .load(users.imageUrl)
+//                .into(binding.imgProfile)
+//        }
 
         private fun likeCount(likes: TextView, postId: String) {
             firestore.collection("Likes").document(postId).addSnapshotListener { value, error ->
@@ -184,6 +195,42 @@ class PostSearchAdapter(
                     Log.e("removeLikeFromFirestore", "Error removing like: $exception")
                 }
         }
+        private fun fetchUserProfile(username: String) {
+            firestore.collection("Users")
+                .whereEqualTo("username", username)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    if (!querySnapshot.isEmpty) {
+                        val userDocument = querySnapshot.documents[0]
+                        val user = userDocument.toObject(Users::class.java)
+                        user?.let {
+                            Glide.with(binding.root)
+                                .load(it.imageUrl)
+                                .into(binding.imgProfile)
+                        }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("fetchUserProfile", "Error fetching user profile: $exception")
+                }
+        }
+//        private fun fetchUserProfile(userId: String) {
+//            firestore.collection("Users").document(userId).get()
+//                .addOnSuccessListener { documentSnapshot ->
+//                    if (documentSnapshot.exists()) {
+//                        val user = documentSnapshot.toObject(Users::class.java)
+//                        user?.let {
+//                            binding.txtUsername.text = it.username
+//                            Glide.with(binding.root)
+//                                .load(it.imageUrl)
+//                                .into(binding.imgProfile)
+//                        }
+//                    }
+//                }
+//                .addOnFailureListener { exception ->
+//                    Log.e("fetchUserProfile", "Error fetching user profile: $exception")
+//                }
+//        }
 
     }
 }

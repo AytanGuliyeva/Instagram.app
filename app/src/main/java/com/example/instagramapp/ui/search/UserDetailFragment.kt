@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentUserDetailBinding
 import com.example.instagramapp.ui.profile.ProfileFragmentDirections
@@ -136,6 +137,9 @@ class UserDetailFragment : Fragment() {
     private fun updateUserUI(user: Users) {
         binding.txtUsername.text = user.username
         binding.txtUsername2.text=user.bio
+        Glide.with(binding.root)
+            .load(user.imageUrl)
+            .into(binding.imgProfile)
 
     }
     private fun btnBack(){

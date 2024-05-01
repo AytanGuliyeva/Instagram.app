@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentProfileBinding
 import com.example.instagramapp.ui.profile.adapter.PostAdapter
@@ -47,6 +48,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         btnSettings()
+        btnEditProfile()
         setupRecyclerView()
         follow()
         viewModel.fetchUserInformation()
@@ -134,8 +136,17 @@ class ProfileFragment : Fragment() {
     private fun updateUserUI(user: Users) {
         binding.txtUsername2.text = user.bio
         binding.txtProfileName.text = user.username
+        Glide.with(binding.root)
+            .load(user.imageUrl)
+            .into(binding.imgProfile)
     }
 
+    private fun btnEditProfile(){
+        binding.btnEditProfile.setOnClickListener {
+            val action=ProfileFragmentDirections.actionProfileFragmentToEditProfileFragment()
+            findNavController().navigate(action)
+        }
+    }
 
     private fun follow(){
         binding.txtFollowingCount.setOnClickListener {

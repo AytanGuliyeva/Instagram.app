@@ -46,6 +46,7 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.rvUsername.visibility = View.GONE
         setupRecyclerView()
         observeUserResult()
         observePostResult()
@@ -128,9 +129,14 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun filterUsersByUsername(query: String?) {
-        query?.let { viewModel.searchUsers(it) }
-    }
+//    private fun filterUsersByUsername(query: String?) {
+//        query?.let {
+//            if (query.isNotEmpty())
+//                viewModel.searchUsers(it) }
+//    }
+private fun filterUsersByUsername(query: String?) {
+    query?.let { viewModel.searchUsers(it) }
+}
 
 
     fun userDetail(userId: String) {
