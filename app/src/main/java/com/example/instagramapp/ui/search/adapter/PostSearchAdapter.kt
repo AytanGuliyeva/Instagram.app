@@ -1,16 +1,11 @@
 package com.example.instagramapp.ui.search.adapter
 
 import Post
-import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.instagramapp.R
@@ -62,9 +57,6 @@ class PostSearchAdapter(
             binding.txtUsername2.text = username
             binding.txtUsername.text = username
             binding.txtCaption.text = post.caption
-           // getProfile(username)
-
-       //     fetchUserProfile(username)
             fetchUserProfile(username)
 
             val timestamp = post.time?.toDate()
@@ -106,8 +98,15 @@ class PostSearchAdapter(
 
             checkLikeStatus(post.postId, binding.btnLike)
             likeCount(binding.txtLikes, post.postId)
+
+            binding.btnSaved.setOnClickListener {
+                toggleSaveStatus(post.postId, binding.btnSaved)
+            }
+
+            checkSaveStatus(post.postId, binding.btnSaved)
         }
 
+        //like
         private fun toggleLikeStatus(postId: String, imageView: ImageView) {
             val tag = imageView.tag?.toString() ?: ""
 
@@ -121,11 +120,6 @@ class PostSearchAdapter(
                 addLikeToFirestore(postId)
             }
         }
-//        private fun getProfile(users: Users){
-//            Glide.with(binding.root)
-//                .load(users.imageUrl)
-//                .into(binding.imgProfile)
-//        }
 
         private fun likeCount(likes: TextView, postId: String) {
             firestore.collection("Likes").document(postId).addSnapshotListener { value, error ->
@@ -195,6 +189,8 @@ class PostSearchAdapter(
                     Log.e("removeLikeFromFirestore", "Error removing like: $exception")
                 }
         }
+
+        //for image url
         private fun fetchUserProfile(username: String) {
             firestore.collection("Users")
                 .whereEqualTo("username", username)
@@ -214,26 +210,74 @@ class PostSearchAdapter(
                     Log.e("fetchUserProfile", "Error fetching user profile: $exception")
                 }
         }
-//        private fun fetchUserProfile(userId: String) {
-//            firestore.collection("Users").document(userId).get()
-//                .addOnSuccessListener { documentSnapshot ->
-//                    if (documentSnapshot.exists()) {
-//                        val user = documentSnapshot.toObject(Users::class.java)
-//                        user?.let {
-//                            binding.txtUsername.text = it.username
-//                            Glide.with(binding.root)
-//                                .load(it.imageUrl)
-//                                .into(binding.imgProfile)
-//                        }
-//                    }
-//                }
-//                .addOnFailureListener { exception ->
-//                    Log.e("fetchUserProfile", "Error fetching user profile: $exception")
-//                }
-//        }
+
+        //save
+
+        private fun addSaveToFirebase(postId: String){
+            val savedData = hashMapOf(
+                postId to true
+            )
+            firestore.collection("Saves").document(auth.currentUser!!.uid)
+                .set(savedData,SetOptions.merge())
+                .addOnSuccessListener {
+                Log.d("addSavedToFirestore", "Save added successfully")
+            }
+                .addOnFailureListener { exception ->
+                    Log.e("addSavedToFirestore", "Error adding save: $exception")
+                }
+        }
+
+        private fun removeSaveFromFirestore(postId: String){
+            firestore.collection("Saves").document(auth.currentUser!!.uid)
+                .update(postId, FieldValue.delete())
+                .addOnSuccessListener {
+                    Log.d("removeSaveFromFirestore", "Save removed successfully")
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("removeSaveFromFirestore", "Error removing save: $exception")
+                }
+        }
+
+        private fun checkSaveStatus(postId: String, imageView: ImageView) {
+            firestore.collection("Saves").document(auth.currentUser!!.uid).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val savedPostId = document.getBoolean(postId) ?: false
+                        if (savedPostId) {
+                            imageView.setImageResource(R.drawable.icons8_saved_icon)
+                            imageView.tag = "saved"
+                        } else {
+                            imageView.setImageResource(R.drawable.save_icon)
+                            imageView.tag = "save"
+                        }
+                    } else {
+                        imageView.setImageResource(R.drawable.save_icon)
+                        imageView.tag = "save"
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("checkSaveStatus", "Error checking save status: $exception")
+                }
+        }
+
+
+        private fun toggleSaveStatus(postId: String, imageView: ImageView) {
+            val tag = imageView.tag?.toString() ?: ""
+
+            if (tag == "saved") {
+                imageView.setImageResource(R.drawable.save_icon)
+                imageView.tag = "save"
+                removeSaveFromFirestore(postId)
+            } else {
+                imageView.setImageResource(R.drawable.icons8_saved_icon)
+                imageView.tag = "saved"
+                addSaveToFirebase(postId)
+            }
+        }
+        }
 
     }
-}
+
 //        private fun shareWithWp(post: Post){
 //            val shareText="Check this post: ${post.postImageUrl}"
 //            val sendIntent= Intent().apply {

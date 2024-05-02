@@ -9,13 +9,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import com.bumptech.glide.Glide
-import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentMainBinding
-import com.example.instagramapp.ui.profile.FollowerViewModel
-import com.example.instagramapp.ui.profile.adapter.PostAdapter
 import com.example.instagramapp.ui.search.adapter.PostSearchAdapter
-import com.example.instagramapp.ui.search.model.Users
 import com.example.instagramapp.util.Resource
 
 

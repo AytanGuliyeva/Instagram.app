@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/splashScreenFragment">
+    app:startDestination="@id/loginFragment">
 
     <fragment
         android:id="@+id/loginFragment"
@@ -147,6 +147,9 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_settingFragment_to_savedPostsFragment"
+            app:destination="@id/savedPostsFragment" />
     </dialog>
     <fragment
         android:id="@+id/userDetailFragment"
@@ -225,6 +228,9 @@
         <argument
             android:name="userId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_followingFragment_to_userDetailFragment"
+            app:destination="@id/userDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/followerFragment"
@@ -234,6 +240,9 @@
         <argument
             android:name="userId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_followerFragment_to_userDetailFragment"
+            app:destination="@id/userDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/editProfileFragment"
@@ -244,6 +253,17 @@
             android:id="@+id/action_editProfileFragment_to_profileFragment"
             app:destination="@id/profileFragment"
             app:popUpTo="@id/editProfileFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/savedPostsFragment"
+        android:name="com.example.instagramapp.ui.profile.SavedPostsFragment"
+        android:label="fragment_saved_posts"
+        tools:layout="@layout/fragment_saved_posts" >
+        <action
+            android:id="@+id/action_savedPostsFragment_to_settingFragment"
+            app:destination="@id/settingFragment"
+            app:popUpTo="@id/savedPostsFragment"
             app:popUpToInclusive="true" />
     </fragment>
 </navigation>

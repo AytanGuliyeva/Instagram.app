@@ -2,18 +2,23 @@ package com.example.instagramapp.ui.profile
 
 import Post
 import android.util.Log
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.instagramapp.ConstValues
+import com.example.instagramapp.R
 import com.example.instagramapp.ui.search.model.Users
 import com.example.instagramapp.util.Resource
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -111,7 +116,154 @@ class PostDetailViewModel : ViewModel() {
         }
     }
 
-    companion object {
+    fun toggleLikeStatus(postId: String, imageView: ImageView) {
+        val tag = imageView.tag?.toString() ?: ""
+
+        if (tag == "liked") {
+            imageView.setImageResource(R.drawable.like_icon)
+            imageView.tag = "like"
+            removeLikeFromFirestore(postId)
+        } else {
+            imageView.setImageResource(R.drawable.icon_liked)
+            imageView.tag = "liked"
+            addLikeToFirestore(postId)
+        }
+    }
+
+    fun likeCount(likes: TextView, postId: String) {
+        firestore.collection("Likes").document(postId).addSnapshotListener { value, error ->
+            if (error != null) {
+                Log.e("likeCount", "Error fetching like count: $error")
+                return@addSnapshotListener
+            }
+            if (value != null && value.exists()) {
+                val likesCount = value.data?.size ?: 0
+                val likesString = if (likesCount == 0) {
+                    "0 likes"
+                } else if (likesCount == 1) {
+                    "1 like"
+                } else {
+                    "$likesCount likes"
+                }
+                likes.text = likesString
+            } else {
+                likes.text = "0 likes"
+            }
+        }
+    }
+
+
+    fun checkLikeStatus(postId: String, imageView: ImageView) {
+        firestore.collection("Likes").document(postId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val likedByCurrentUser =
+                        document.getBoolean(auth) ?: false
+                    if (likedByCurrentUser) {
+                        imageView.setImageResource(R.drawable.icon_liked)
+                        imageView.tag = "liked"
+                    } else {
+                        imageView.setImageResource(R.drawable.like_icon)
+                        imageView.tag = "like"
+                    }
+                } else {
+                    imageView.setImageResource(R.drawable.like_icon)
+                    imageView.tag = "like"
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("checkLikeStatus", "Error checking like status: $exception")
+            }
+    }
+
+    private fun addLikeToFirestore(postId: String) {
+        val likeData = hashMapOf(
+            auth to true
+        )
+        firestore.collection("Likes").document(postId).set(likeData, SetOptions.merge())
+            .addOnSuccessListener {
+                Log.d("addLikeToFirestore", "Like added successfully")
+            }
+            .addOnFailureListener { exception ->
+                Log.e("addLikeToFirestore", "Error adding like: $exception")
+            }
+    }
+
+    private fun removeLikeFromFirestore(postId: String) {
+        firestore.collection("Likes").document(postId)
+            .update(auth, FieldValue.delete())
+            .addOnSuccessListener {
+                Log.d("removeLikeFromFirestore", "Like removed successfully")
+            }
+            .addOnFailureListener { exception ->
+                Log.e("removeLikeFromFirestore", "Error removing like: $exception")
+            }
+    }
+    //save
+
+     fun addSaveToFirebase(postId: String){
+        val savedData = hashMapOf(
+            postId to true
+        )
+        firestore.collection("Saves").document(auth)
+            .set(savedData,SetOptions.merge())
+            .addOnSuccessListener {
+                Log.d("addSavedToFirestore", "Save added successfully")
+            }
+            .addOnFailureListener { exception ->
+                Log.e("addSavedToFirestore", "Error adding save: $exception")
+            }
+    }
+
+     fun removeSaveFromFirestore(postId: String){
+        firestore.collection("Saves").document(auth)
+            .update(postId, FieldValue.delete())
+            .addOnSuccessListener {
+                Log.d("removeSaveFromFirestore", "Save removed successfully")
+            }
+            .addOnFailureListener { exception ->
+                Log.e("removeSaveFromFirestore", "Error removing save: $exception")
+            }
+    }
+
+     fun checkSaveStatus(postId: String, imageView: ImageView) {
+        firestore.collection("Saves").document(auth).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val savedPostId = document.getBoolean(postId) ?: false
+                    if (savedPostId) {
+                        imageView.setImageResource(R.drawable.icons8_saved_icon)
+                        imageView.tag = "saved"
+                    } else {
+                        imageView.setImageResource(R.drawable.save_icon)
+                        imageView.tag = "save"
+                    }
+                } else {
+                    imageView.setImageResource(R.drawable.save_icon)
+                    imageView.tag = "save"
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("checkSaveStatus", "Error checking save status: $exception")
+            }
+    }
+
+
+    fun toggleSaveStatus(postId: String, imageView: ImageView) {
+        val tag = imageView.tag?.toString() ?: ""
+
+        if (tag == "saved") {
+            imageView.setImageResource(R.drawable.save_icon)
+            imageView.tag = "save"
+            removeSaveFromFirestore(postId)
+        } else {
+            imageView.setImageResource(R.drawable.icons8_saved_icon)
+            imageView.tag = "saved"
+            addSaveToFirebase(postId)
+        }
+    }
+
+companion object {
         private const val TAG = "PostDetailViewModel"
     }
 }

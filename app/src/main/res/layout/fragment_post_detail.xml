@@ -107,7 +107,7 @@
             android:background="@color/white"
             android:contentDescription="@string/saved"
             android:padding="13dp"
-            android:src="@drawable/saved_icon"
+            android:src="@drawable/save_icon"
             app:layout_constraintEnd_toEndOf="@id/imgPost"
             app:layout_constraintTop_toBottomOf="@id/imgPost" />
 

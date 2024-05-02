@@ -158,4 +158,5 @@ class ProfileFragment : Fragment() {
             findNavController().navigate(action)
         }
     }
+
 }

@@ -57,6 +57,7 @@ class PostDetailFragment : Fragment() {
                     binding.progressBar.visibility = View.GONE
 
                 }
+
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
                 }
@@ -71,12 +72,13 @@ class PostDetailFragment : Fragment() {
                 is Resource.Success -> {
                     updatePostUI(postResource.data)
                     binding.btnShare.setOnClickListener {
-                //        shareWithWp(postResource.data)
+                        //        shareWithWp(postResource.data)
 
                     }
                     binding.progressBar.visibility = View.GONE
 
                 }
+
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
                 }
@@ -88,7 +90,7 @@ class PostDetailFragment : Fragment() {
         }
 
         viewModel.fetchUserInformation(args.userId)
-        Log.e("TAG", "onViewCreated: ${args.postId}", )
+        Log.e("TAG", "onViewCreated: ${args.postId}",)
         viewModel.fetchPosts(args.postId)
 
 
@@ -102,9 +104,11 @@ class PostDetailFragment : Fragment() {
             .into(binding.imgProfile)
 
     }
+
     private fun updatePostUI(post: Post) {
-        checkLikeStatus(post.postId, binding.btnLike)
-        likeCount(binding.txtLikes, post.postId)
+        viewModel.checkLikeStatus(post.postId, binding.btnLike)
+        viewModel.checkSaveStatus(post.postId,binding.btnSaved)
+        viewModel.likeCount(binding.txtLikes, post.postId)
         binding.txtCaption.text = post.caption
         Glide.with(binding.root)
             .load(post.postImageUrl)
@@ -139,8 +143,12 @@ class PostDetailFragment : Fragment() {
             }
         }
         binding.btnLike.setOnClickListener {
-            toggleLikeStatus(post.postId, binding.btnLike)
-        }    }
+            viewModel.toggleLikeStatus(post.postId, binding.btnLike)
+        }
+        binding.btnSaved.setOnClickListener {
+            viewModel.toggleSaveStatus(post.postId, binding.btnSaved)
+        }
+    }
 
 
     private fun btnBack() {
@@ -149,104 +157,4 @@ class PostDetailFragment : Fragment() {
             findNavController().navigate(action)
         }
     }
-
-
-    private fun toggleLikeStatus(postId: String, imageView: ImageView) {
-        val tag = imageView.tag?.toString() ?: ""
-
-        if (tag == "liked") {
-            imageView.setImageResource(R.drawable.like_icon)
-            imageView.tag = "like"
-            removeLikeFromFirestore(postId)
-        } else {
-            imageView.setImageResource(R.drawable.icon_liked)
-            imageView.tag = "liked"
-            addLikeToFirestore(postId)
-        }
-    }
-
-    private fun likeCount(likes: TextView, postId: String) {
-        firestore.collection("Likes").document(postId).addSnapshotListener { value, error ->
-            if (error != null) {
-                Log.e("likeCount", "Error fetching like count: $error")
-                return@addSnapshotListener
-            }
-            if (value != null && value.exists()) {
-                val likesCount = value.data?.size ?: 0
-                val likesString = if (likesCount == 0) {
-                    "0 likes"
-                } else if (likesCount == 1) {
-                    "1 like"
-                } else {
-                    "$likesCount likes"
-                }
-                likes.text = likesString
-            } else {
-                likes.text = "0 likes"
-            }
-        }
-    }
-
-
-    private fun checkLikeStatus(postId: String, imageView: ImageView) {
-        firestore.collection("Likes").document(postId).get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val likedByCurrentUser =
-                        document.getBoolean(auth.currentUser!!.uid) ?: false
-                    if (likedByCurrentUser) {
-                        imageView.setImageResource(R.drawable.icon_liked)
-                        imageView.tag = "liked"
-                    } else {
-                        imageView.setImageResource(R.drawable.like_icon)
-                        imageView.tag = "like"
-                    }
-                } else {
-                    imageView.setImageResource(R.drawable.like_icon)
-                    imageView.tag = "like"
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.e("checkLikeStatus", "Error checking like status: $exception")
-            }
-    }
-
-    private fun addLikeToFirestore(postId: String) {
-        val likeData = hashMapOf(
-            auth.currentUser!!.uid to true
-        )
-        firestore.collection("Likes").document(postId).set(likeData, SetOptions.merge())
-            .addOnSuccessListener {
-                Log.d("addLikeToFirestore", "Like added successfully")
-            }
-            .addOnFailureListener { exception ->
-                Log.e("addLikeToFirestore", "Error adding like: $exception")
-            }
-    }
-
-    private fun removeLikeFromFirestore(postId: String) {
-        firestore.collection("Likes").document(postId)
-            .update(auth.currentUser!!.uid, FieldValue.delete())
-            .addOnSuccessListener {
-                Log.d("removeLikeFromFirestore", "Like removed successfully")
-            }
-            .addOnFailureListener { exception ->
-                Log.e("removeLikeFromFirestore", "Error removing like: $exception")
-            }
-    }
-
 }
-//    private fun shareWithWp(post: Post){
-//        val shareText="Check this post: ${post.postImageUrl}"
-//        val sendIntent= Intent().apply {
-//            action=Intent.ACTION_SEND
-//            putExtra(Intent.EXTRA_TEXT,shareText)
-//            type="text/plain"
-//            setPackage("com.whatsapp")
-//        }
-//        try {
-//            binding.root.context.startActivity(sendIntent)
-//        }catch (e: ActivityNotFoundException){
-//            Toast.makeText(binding.root.context, "WhatsApp is not installed.",Toast.LENGTH_SHORT).show()
-//        }
-//    }

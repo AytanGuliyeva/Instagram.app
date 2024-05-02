@@ -36,6 +36,7 @@ class SettingFragment : BottomSheetDialogFragment(R.layout.bottom_sheet_settings
         super.onViewCreated(view, savedInstanceState)
         auth = Firebase.auth
 
+        btnSaved()
         btnLogout()
     }
 
@@ -60,6 +61,12 @@ class SettingFragment : BottomSheetDialogFragment(R.layout.bottom_sheet_settings
             }
 
             dialog.show()
+        }
+    }
+    private fun btnSaved(){
+        binding.txtSaved.setOnClickListener {
+            val action=SettingFragmentDirections.actionSettingFragmentToSavedPostsFragment()
+            findNavController().navigate(action)
         }
     }
 }

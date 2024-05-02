@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentFollowingBinding
+import com.example.instagramapp.ui.search.SearchFragmentDirections
 import com.example.instagramapp.ui.search.adapter.UserAdapter
 import com.example.instagramapp.ui.search.model.Users
 import com.example.instagramapp.util.Resource
@@ -60,12 +62,19 @@ class FollowingFragment : Fragment() {
 
     private fun setupRecyclerView() {
         userAdapter = UserAdapter(
-            itemClick = {
-                //electedUser=it;userDetail(selectedUser!!.userId)
-            }
+                itemClick = {
+                    selectedUser = it
+                    userDetail(it.userId)
+                }
         )
         binding.rvFollowing.adapter = userAdapter
     }
 
+    fun userDetail(userId: String) {
+        if (selectedUser != null) {
+            val action = FollowingFragmentDirections.actionFollowingFragmentToUserDetailFragment(userId)
+            findNavController().navigate(action)
+        }
+    }
 
 }

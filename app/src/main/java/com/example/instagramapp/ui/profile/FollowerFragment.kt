@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentFollowerBinding
+import com.example.instagramapp.ui.search.SearchFragmentDirections
 import com.example.instagramapp.ui.search.adapter.UserAdapter
 import com.example.instagramapp.ui.search.model.Users
 import com.example.instagramapp.util.Resource
@@ -19,10 +21,10 @@ class FollowerFragment : Fragment() {
     private lateinit var binding: FragmentFollowerBinding
     private val  userAdapter by lazy {
         UserAdapter(
-        itemClick = {
-            //electedUser=it
-            // userDetail(selectedUser!!.userId)
-        }
+            itemClick = {
+                selectedUser = it
+                userDetail(it.userId)
+            }
     ) }
     private val viewModel: FollowerViewModel by viewModels()
     private var selectedUser: Users? = null
@@ -39,14 +41,13 @@ class FollowerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val userId = arguments?.getString("userId") as String
-        viewModel.fetchFollowers(userId)
-        Log.e("TAG", "onViewCreated: $userId", )
+        // val userId = arguments?.getString("userId") as String  <-- Bu satırı kaldırın
+        viewModel.fetchFollowers(args.userId)
+        Log.e("TAG", "onViewCreated: ${args.userId}", )
         setupRecyclerView()
-//      viewModel.fetchFollowers(userId)
         observeFollowers()
-
     }
+
 
     private fun observeFollowers() {
         viewModel.followerResult.observe(viewLifecycleOwner) { resource ->
@@ -67,6 +68,11 @@ class FollowerFragment : Fragment() {
         }
     }
 
+
+    fun userDetail(userId: String) {
+        val action = FollowerFragmentDirections.actionFollowerFragmentToUserDetailFragment(userId)
+        findNavController().navigate(action)
+    }
 
     private fun setupRecyclerView() {
 //        userAdapter = UserAdapter(
