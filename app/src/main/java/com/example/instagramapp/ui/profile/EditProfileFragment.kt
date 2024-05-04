@@ -123,6 +123,7 @@ class EditProfileFragment : Fragment() {
     }
 
 
+
     private fun uploadImage(username: String, bio: String) {
         selectedImageBitmap?.let { bitmap ->
             val boas = ByteArrayOutputStream()

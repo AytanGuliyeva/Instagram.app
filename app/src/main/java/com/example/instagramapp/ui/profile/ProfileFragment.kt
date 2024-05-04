@@ -96,6 +96,7 @@ class ProfileFragment : Fragment() {
         viewModel.userInformation.observe(viewLifecycleOwner) { userResource ->
             when (userResource) {
                 is Resource.Success -> {
+                    swipeRefresh(userResource.data)
                     updateUserUI(userResource.data)
                     binding.progressBar.visibility = View.GONE
 
@@ -156,6 +157,14 @@ class ProfileFragment : Fragment() {
         binding.txtFollowersCount.setOnClickListener {
             val action = ProfileFragmentDirections.actionProfileFragmentToFollowFragment(auth)
             findNavController().navigate(action)
+        }
+    }
+
+
+    private fun swipeRefresh(user: Users) {
+        binding.swipeRefresh.setOnRefreshListener {
+            updateUserUI(user)
+            binding.swipeRefresh.isRefreshing = false
         }
     }
 
