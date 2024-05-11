@@ -15,7 +15,7 @@ import com.example.instagramapp.util.Resource
 
 
 class MainFragment : Fragment() {
-    private lateinit var binding:FragmentMainBinding
+    private lateinit var binding: FragmentMainBinding
     private val viewModel: MainViewModel by viewModels()
     private lateinit var postAdapter: PostSearchAdapter
 
@@ -24,7 +24,7 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentMainBinding.inflate(inflater,container,false)
+        binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -32,14 +32,16 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         observePostData()
-        viewModel.fetchPosts()
+        // viewModel.fetchPosts()
     }
+
     private fun observePostData() {
         viewModel.postResult.observe(viewLifecycleOwner, Observer { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                 }
+
                 is Resource.Success -> {
                     if (resource.data.isEmpty()) {
                         binding.txtNoPost.visibility = View.VISIBLE
@@ -50,17 +52,18 @@ class MainFragment : Fragment() {
                         binding.imgCamera.visibility = View.GONE
                         val posts = resource.data
                         val postWithUsernames = mutableListOf<Pair<Post, String>>()
-                        posts.forEach { post ->
-                            viewModel.fetchUsername(post.userId) { username ->
-                                postWithUsernames.add(Pair(post, username))
-                                if (postWithUsernames.size == posts.size) {
-                                    postAdapter.submitList(postWithUsernames)
-                                    binding.progressBar.visibility = View.GONE
-                                }
-                            }
-                        }
+//                        posts.forEach { post ->
+//                                postWithUsernames.add(Pair(post, ""))
+//                                if (postWithUsernames.size == posts.size) {
+////                                    postAdapter.submitList(postWithUsernames)
+////                                    binding.progressBar.visibility = View.GONE
+//                                }
+//                        }
+                        postAdapter.submitList(posts)
+                        binding.progressBar.visibility = View.GONE
                     }
                 }
+
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), "Error occurred!", Toast.LENGTH_SHORT).show()
@@ -72,11 +75,14 @@ class MainFragment : Fragment() {
 
     private fun setupRecyclerView() {
         postAdapter = PostSearchAdapter(itemClick = {
-           // selectedPost = it;postDetail(selectedPost!!.postId, selectedPost!!.userId)
-        })
+            // selectedPost = it;postDetail(selectedPost!!.postId, selectedPost!!.userId)
+        },
+            commentButtonClick = { postId ->
+                val bottomSheet = CommentsBottomSheetFragment.newInstance(postId)
+                bottomSheet.show(childFragmentManager, bottomSheet.tag)
+            })
         binding.rvPost.adapter = postAdapter
     }
-
 
 
 }

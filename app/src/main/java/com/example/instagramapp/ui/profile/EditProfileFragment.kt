@@ -1,10 +1,12 @@
 package com.example.instagramapp.ui.profile
 
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +26,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
+import java.util.UUID
 
 
 class EditProfileFragment : Fragment() {
@@ -34,27 +37,36 @@ class EditProfileFragment : Fragment() {
     private val viewModel: EditProfileViewModel by viewModels()
     private var selectedImageBitmap: Bitmap? = null
     private val PICK_IMAGE_REQUEST = 71
+    private lateinit var progressDialoq: ProgressDialog
+    private lateinit var imageUrl: String
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentEditProfileBinding.inflate(inflater,container,false)
+        binding = FragmentEditProfileBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        progressDialoq = ProgressDialog(requireContext())
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
         storage = FirebaseStorage.getInstance()
         viewModel.getUserInfo()
-        viewModel.userInformation.observe(viewLifecycleOwner, Observer { resource ->
+        viewModel.userInformation.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
+                    Log.e("TAG", "update: ${resource.data.username}")
                     val user = resource.data
                     updateUI(user)
+                    imageUrl = user.imageUrl
+                    Log.e("TAG", "updateSuccess: ${resource.data.imageUrl}")
+
                 }
+
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
                 }
@@ -63,7 +75,7 @@ class EditProfileFragment : Fragment() {
                     binding.progressBar.visibility = View.VISIBLE
                 }
             }
-        })
+        }
 
 
         btnBack()
@@ -79,13 +91,15 @@ class EditProfileFragment : Fragment() {
 
     private fun updateUI(user: Users) {
         binding.txtEditUsurname.setText(user.username)
+        Log.e("TAG", "updateUI: ${user.username}")
         binding.txtEditBio.setText(user.bio)
         Glide.with(requireContext()).load(user.imageUrl).into(binding.imgProfile)
     }
 
     private fun selectedImage() {
         binding.imgProfile.setOnClickListener {
-            val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            val galleryIntent =
+                Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             startActivityForResult(galleryIntent, PICK_IMAGE_REQUEST)
         }
     }
@@ -95,7 +109,10 @@ class EditProfileFragment : Fragment() {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.data != null) {
             val selectedImageUri = data.data
-            selectedImageBitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, selectedImageUri)
+            selectedImageBitmap = MediaStore.Images.Media.getBitmap(
+                requireContext().contentResolver,
+                selectedImageUri
+            )
             binding.imgProfile.setImageBitmap(selectedImageBitmap)
         } else {
             Toast.makeText(requireContext(), "Something gone wrong", Toast.LENGTH_SHORT).show()
@@ -104,24 +121,26 @@ class EditProfileFragment : Fragment() {
 
     private fun addImage() {
         binding.txtDone.setOnClickListener {
+            progressDialoq.setTitle("Info")
+            progressDialoq.setMessage("Update user info...")
+            progressDialoq.show()
             val username = binding.txtEditUsurname.text.toString()
             val bio = binding.txtEditBio.text.toString()
 
             if (selectedImageBitmap != null) {
                 uploadImage(username, bio)
             } else {
-                updateUserProfile(username, bio, "https://firebasestorage.googleapis.com/v0/b/instagramclone-d83f1.appspot.com/o/photo_5393077931670099315_m.jpg?alt=media&token=929e8f56-74c9-4247-b1f6-173f858d9f04")
+                updateUserProfile(username, bio, imageUrl)
             }
 
 //            val user = Users(username,"","")
 //            updateUI(user)
 
 
-            val action = EditProfileFragmentDirections.actionEditProfileFragmentToProfileFragment()
-            findNavController().navigate(action)
+//            val action = EditProfileFragmentDirections.actionEditProfileFragmentToProfileFragment()
+//            findNavController().navigate(action)
         }
     }
-
 
 
     private fun uploadImage(username: String, bio: String) {
@@ -129,8 +148,10 @@ class EditProfileFragment : Fragment() {
             val boas = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, boas)
             val imageData = boas.toByteArray()
+            val uuid = UUID.randomUUID()
+            val imageName = "$uuid.jpg"
 
-            val storageRef = storage.reference.child("images").child("${auth.currentUser!!.uid}.jpg")
+            val storageRef = storage.reference.child("images").child(imageName)
             storageRef.putBytes(imageData)
                 .addOnSuccessListener { taskSnapshot ->
                     storageRef.downloadUrl.addOnSuccessListener { uri ->
@@ -138,13 +159,15 @@ class EditProfileFragment : Fragment() {
                         updateUserProfile(username, bio, downloadUrl)
                     }
                 }.addOnFailureListener {
-                    Toast.makeText(requireContext(), "Failed to upload image!", Toast.LENGTH_SHORT).show()
-                   // binding.progressBar.visibility = View.GONE
+                    Toast.makeText(requireContext(), "Failed to upload image!", Toast.LENGTH_SHORT)
+                        .show()
+                    // binding.progressBar.visibility = View.GONE
                 }
+
         }
     }
 
     private fun updateUserProfile(username: String, bio: String, imageUrl: String) {
-        viewModel.updateUserInfo(username, bio, imageUrl)
+        viewModel.updateUserInfo(username, bio, imageUrl, progressDialoq)
     }
 }

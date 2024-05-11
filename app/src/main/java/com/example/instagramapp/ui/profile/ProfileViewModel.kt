@@ -10,7 +10,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 
-class ProfileViewModel: ViewModel() {
+class ProfileViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = Firebase.auth.currentUser!!.uid
     private val _postResult = MutableLiveData<Resource<List<Post>>>()

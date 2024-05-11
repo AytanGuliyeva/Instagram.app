@@ -19,13 +19,14 @@ import kotlin.math.log
 
 class FollowerFragment : Fragment() {
     private lateinit var binding: FragmentFollowerBinding
-    private val  userAdapter by lazy {
+    private val userAdapter by lazy {
         UserAdapter(
             itemClick = {
                 selectedUser = it
-                userDetail(it.userId)
+                //  userDetail(it.userId)
             }
-    ) }
+        )
+    }
     private val viewModel: FollowerViewModel by viewModels()
     private var selectedUser: Users? = null
     private lateinit var userId: String
@@ -43,7 +44,7 @@ class FollowerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         // val userId = arguments?.getString("userId") as String  <-- Bu satırı kaldırın
         viewModel.fetchFollowers(args.userId)
-        Log.e("TAG", "onViewCreated: ${args.userId}", )
+        Log.e("TAG", "onViewCreated: ${args.userId}")
         setupRecyclerView()
         observeFollowers()
     }
@@ -54,7 +55,7 @@ class FollowerFragment : Fragment() {
             when (resource) {
                 is Resource.Success -> {
                     userAdapter.submitList(resource.data)
-                    Log.e("TAG", "ayten: ${resource.data}", )
+                    Log.e("TAG", "ayten: ${resource.data}")
                 }
 
                 is Resource.Loading -> {
@@ -69,10 +70,10 @@ class FollowerFragment : Fragment() {
     }
 
 
-    fun userDetail(userId: String) {
-        val action = FollowerFragmentDirections.actionFollowerFragmentToUserDetailFragment(userId)
-        findNavController().navigate(action)
-    }
+//    fun userDetail(userId: String) {
+//        val action = FollowerFragmentDirections.actionFollowerFragmentToUserDetailFragment(userId)
+//        findNavController().navigate(action)
+//    }
 
     private fun setupRecyclerView() {
 //        userAdapter = UserAdapter(

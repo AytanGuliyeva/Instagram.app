@@ -35,7 +35,6 @@ class StartActivity : AppCompatActivity() {
     }
 
 
-
     fun hideBottomNavigationView() {
         binding.bottomNav.visibility = View.GONE
     }

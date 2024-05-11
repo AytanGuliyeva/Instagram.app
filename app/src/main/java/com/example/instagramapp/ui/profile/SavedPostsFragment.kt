@@ -19,12 +19,11 @@ class SavedPostsFragment : Fragment() {
     private lateinit var postAdapter: PostSearchAdapter
 
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-       binding = FragmentSavedPostsBinding.inflate(inflater,container,false)
+        binding = FragmentSavedPostsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -56,15 +55,20 @@ class SavedPostsFragment : Fragment() {
             }
         }
     }
-    private fun btnBack(){
+
+    private fun btnBack() {
         binding.btnBack.setOnClickListener {
-            val action= SavedPostsFragmentDirections.actionSavedPostsFragmentToSettingFragment()
+            val action = SavedPostsFragmentDirections.actionSavedPostsFragmentToSettingFragment()
             findNavController().navigate(action)
         }
     }
+
     private fun setupRecyclerView() {
         postAdapter = PostSearchAdapter(itemClick = {
             // selectedPost = it;postDetail(selectedPost!!.postId, selectedPost!!.userId)
+        }, commentButtonClick = { //postId ->
+//            val bottomSheet = CommentsBottomSheetFragment.newInstance(postId)
+//            bottomSheet.show(childFragmentManager, bottomSheet.tag)
         })
         binding.rvSaved.adapter = postAdapter
     }

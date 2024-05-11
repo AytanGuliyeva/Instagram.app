@@ -7,7 +7,12 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.instagramapp.ui.profile.FollowerFragment
 import com.example.instagramapp.ui.profile.FollowingFragment
 
-class PagerAdapter (fragmentManager: FragmentManager, lifecycle: Lifecycle,val followerFragment: FollowerFragment,val followingFragment: FollowingFragment) :
+class PagerAdapter(
+    fragmentManager: FragmentManager,
+    lifecycle: Lifecycle,
+    val followerFragment: FollowerFragment,
+    val followingFragment: FollowingFragment
+) :
     FragmentStateAdapter(fragmentManager, lifecycle) {
     override fun getItemCount(): Int {
         return 2

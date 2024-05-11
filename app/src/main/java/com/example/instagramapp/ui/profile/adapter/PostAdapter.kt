@@ -69,5 +69,5 @@ class PostAdapter(
                 itemClick(item)
             }
         }
-        }
+    }
 }

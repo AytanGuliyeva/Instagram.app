@@ -63,9 +63,10 @@ class SettingFragment : BottomSheetDialogFragment(R.layout.bottom_sheet_settings
             dialog.show()
         }
     }
-    private fun btnSaved(){
+
+    private fun btnSaved() {
         binding.txtSaved.setOnClickListener {
-            val action=SettingFragmentDirections.actionSettingFragmentToSavedPostsFragment()
+            val action = SettingFragmentDirections.actionSettingFragmentToSavedPostsFragment()
             findNavController().navigate(action)
         }
     }

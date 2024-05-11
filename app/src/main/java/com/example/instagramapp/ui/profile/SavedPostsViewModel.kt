@@ -13,7 +13,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 
-class SavedPostsViewModel:ViewModel() {
+class SavedPostsViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val _savedPosts = MutableLiveData<Resource<List<Pair<Post, String>>>>()
@@ -42,7 +42,8 @@ class SavedPostsViewModel:ViewModel() {
                                 val post = document.toObject(Post::class.java)
                                 if (post != null) {
                                     val userId = post.userId
-                                    val userTask = firestore.collection("Users").document(userId).get()
+                                    val userTask =
+                                        firestore.collection("Users").document(userId).get()
                                     fetchUserTasks.add(userTask)
 
                                     userTask.addOnSuccessListener { userDocument ->

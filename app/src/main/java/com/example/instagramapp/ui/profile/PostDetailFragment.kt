@@ -19,6 +19,7 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentPostDetailBinding
+import com.example.instagramapp.ui.main.CommentsBottomSheetFragment
 import com.example.instagramapp.ui.profile.PostDetailViewModel
 import com.example.instagramapp.ui.search.UserDetailFragmentArgs
 import com.example.instagramapp.ui.search.model.Users
@@ -49,6 +50,7 @@ class PostDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         btnBack()
+
 
         viewModel.userInformation.observe(viewLifecycleOwner) { userResource ->
             when (userResource) {
@@ -88,10 +90,25 @@ class PostDetailFragment : Fragment() {
                 }
             }
         }
+        viewModel.commentCount.observe(viewLifecycleOwner) { commentResource ->
+            when (commentResource) {
+                is Resource.Success -> {
+                    val commentText = "View all ${commentResource.data} comments"
+                    binding.txtComment.text = commentText
 
+                }
+
+                is Resource.Error -> {
+                }
+
+                is Resource.Loading -> {
+                }
+            }
+        }
         viewModel.fetchUserInformation(args.userId)
-        Log.e("TAG", "onViewCreated: ${args.postId}",)
+        Log.e("TAG", "onViewCreated: ${args.postId}")
         viewModel.fetchPosts(args.postId)
+        viewModel.fetchCommentCount(args.postId)
 
 
     }
@@ -107,7 +124,7 @@ class PostDetailFragment : Fragment() {
 
     private fun updatePostUI(post: Post) {
         viewModel.checkLikeStatus(post.postId, binding.btnLike)
-        viewModel.checkSaveStatus(post.postId,binding.btnSaved)
+        viewModel.checkSaveStatus(post.postId, binding.btnSaved)
         viewModel.likeCount(binding.txtLikes, post.postId)
         binding.txtCaption.text = post.caption
         Glide.with(binding.root)
@@ -148,13 +165,22 @@ class PostDetailFragment : Fragment() {
         binding.btnSaved.setOnClickListener {
             viewModel.toggleSaveStatus(post.postId, binding.btnSaved)
         }
+        binding.btnComment.setOnClickListener {
+            val bottomSheet = CommentsBottomSheetFragment.newInstance(post.postId)
+            bottomSheet.show(childFragmentManager, bottomSheet.tag)
+        }
+        binding.txtComment.setOnClickListener {
+            val bottomSheet = CommentsBottomSheetFragment.newInstance(post.postId)
+            bottomSheet.show(childFragmentManager, bottomSheet.tag)
+        }
+
     }
 
 
     private fun btnBack() {
         binding.btnBack.setOnClickListener {
             val action = PostDetailFragmentDirections.actionPostDetailFragmentToProfileFragment()
-            findNavController().navigate(action)
+            findNavController().popBackStack()
         }
     }
 }

@@ -36,7 +36,6 @@ class ProfileFragment : Fragment() {
     private var selectedPost: Post? = null
 
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -81,7 +80,7 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
-        viewModel.postSize.observe(viewLifecycleOwner){ postCount ->
+        viewModel.postSize.observe(viewLifecycleOwner) { postCount ->
             binding.txtPostCount.text = postCount.toString()
         }
 
@@ -116,7 +115,8 @@ class ProfileFragment : Fragment() {
     private fun setupRecyclerView() {
         postAdapter = PostAdapter(itemClick = {
             selectedPost = it
-            postDetail(selectedPost!!.postId, selectedPost!!.userId)})
+            postDetail(selectedPost!!.postId, selectedPost!!.userId)
+        })
         binding.rvPost.adapter = postAdapter
     }
 
@@ -142,14 +142,14 @@ class ProfileFragment : Fragment() {
             .into(binding.imgProfile)
     }
 
-    private fun btnEditProfile(){
+    private fun btnEditProfile() {
         binding.btnEditProfile.setOnClickListener {
-            val action=ProfileFragmentDirections.actionProfileFragmentToEditProfileFragment()
+            val action = ProfileFragmentDirections.actionProfileFragmentToEditProfileFragment()
             findNavController().navigate(action)
         }
     }
 
-    private fun follow(){
+    private fun follow() {
         binding.txtFollowingCount.setOnClickListener {
             val action = ProfileFragmentDirections.actionProfileFragmentToFollowFragment(auth)
             findNavController().navigate(action)

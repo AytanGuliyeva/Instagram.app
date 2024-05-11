@@ -1,5 +1,7 @@
 package com.example.instagramapp.ui.profile
 
+import android.app.ProgressDialog
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,17 +24,32 @@ class EditProfileViewModel : ViewModel() {
     fun getUserInfo() {
         firestore.collection("Users").document(auth).addSnapshotListener { value, error ->
             if (error != null) {
-               // _userInformation.postValue(Resource.Error("Failed to fetch user information"))
+                // _userInformation.postValue(Resource.Error("Failed to fetch user information"))
             } else {
                 val bio = value?.getString("bio") ?: ""
                 val username = value?.getString("username") ?: ""
                 val imageUrl = value?.getString("imageUrl") ?: ""
-                _userInformation.postValue(Resource.Success(Users(username, imageUrl, bio)))
+                Log.e("TAG", "updateUI: $username")
+
+                _userInformation.postValue(
+                    Resource.Success(
+                        Users(
+                            username = username,
+                            imageUrl = imageUrl,
+                            bio = bio
+                        )
+                    )
+                )
             }
         }
     }
 
-    fun updateUserInfo(username: String, bio: String, imageUrl: String) {
+    fun updateUserInfo(
+        username: String,
+        bio: String,
+        imageUrl: String,
+        progressDialoq: ProgressDialog
+    ) {
         val userRef = firestore.collection("Users").document(auth)
         userRef.update(
             mapOf(
@@ -41,7 +58,7 @@ class EditProfileViewModel : ViewModel() {
                 "imageUrl" to imageUrl
             )
         ).addOnSuccessListener {
-            // User information updated successfully
+            progressDialoq.dismiss()
         }.addOnFailureListener { e ->
             // Handle failure
         }

@@ -20,12 +20,6 @@
         android:icon="@drawable/add_icon"
         android:title="@string/add" />
     <item
-        android:id="@+id/reelsFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:icon="@drawable/reels_icon"
-        android:title="@string/reels" />
-    <item
         android:id="@+id/profileFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

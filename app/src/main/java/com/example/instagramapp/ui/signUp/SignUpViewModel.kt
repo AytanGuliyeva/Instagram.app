@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.example.instagramapp.util.Resource
 import com.google.firebase.firestore.FirebaseFirestore
 
-class SignUpViewModel:ViewModel() {
+class SignUpViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
@@ -17,15 +17,16 @@ class SignUpViewModel:ViewModel() {
         get() = _loading
 
     private val _userCreated = MutableLiveData<Resource<Users>>()
-    val userCreated:LiveData<Resource<Users>>
+    val userCreated: LiveData<Resource<Users>>
         get() = _userCreated
+
     fun signUp(username: String, email: String, password: String) {
         _userCreated.postValue(com.example.instagramapp.util.Resource.Loading)
         auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener {
                 userAccount(username, email, password)
             }
-            .addOnFailureListener {exception ->
+            .addOnFailureListener { exception ->
                 _userCreated.postValue(com.example.instagramapp.util.Resource.Error(exception))
             }
     }
@@ -44,10 +45,10 @@ class SignUpViewModel:ViewModel() {
         val refDb = db.collection("Users").document(userId)
         refDb.set(userMap)
             .addOnSuccessListener {
-                _userCreated.value =Resource.Success(Users(userId, username, email, password, "", ""))
+                _userCreated.value =
+                    Resource.Success(Users(userId, username, email, password, "", ""))
             }
-            .addOnFailureListener {
-                    exception ->
+            .addOnFailureListener { exception ->
                 _userCreated.postValue(Resource.Error(exception))
             }
     }

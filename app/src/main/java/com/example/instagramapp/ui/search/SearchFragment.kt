@@ -84,30 +84,30 @@ class SearchFragment : Fragment() {
     }
 
     private fun observeUserResult() {
-      //  binding.searchView.setOnClickListener {
-            viewModel.userResult.observe(viewLifecycleOwner) { resource ->
-                when (resource) {
-                    is Resource.Success<List<Users>> -> {
-                        //    binding.searchView.setOnClickListener {
+        viewModel.userResult.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success<List<Users>> -> {
+                    if (binding.searchView.query.isNullOrEmpty()) {
+                        binding.rvUsername.visibility = View.GONE
+                    } else {
                         userAdapter.submitList(resource.data)
                         binding.rvUsername.visibility = View.VISIBLE
-                        binding.progressBar.visibility = View.GONE
-                        //  }
-
                     }
+                    binding.progressBar.visibility = View.GONE
+                }
 
-                    is Resource.Loading -> {
-                        binding.progressBar.visibility = View.VISIBLE
-                        binding.rvUsername.visibility = View.GONE
-                    }
+                is Resource.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.rvUsername.visibility = View.GONE
+                }
 
-                    is Resource.Error -> {
-                        binding.progressBar.visibility = View.GONE
-                    }
+                is Resource.Error -> {
+                    binding.progressBar.visibility = View.GONE
                 }
             }
-       // }
+        }
     }
+
 
     private fun observePostResult() {
         viewModel.postResult.observe(viewLifecycleOwner) { resource ->
@@ -134,10 +134,16 @@ class SearchFragment : Fragment() {
 //            if (query.isNotEmpty())
 //                viewModel.searchUsers(it) }
 //    }
-private fun filterUsersByUsername(query: String?) {
-    query?.let { viewModel.searchUsers(it) }
-}
+//private fun filterUsersByUsername(query: String?) {
+//    query?.let { viewModel.searchUsers(it) }
+//}
 
+
+    private fun filterUsersByUsername(query: String?) {
+        query?.let {
+            viewModel.searchUsers(it)
+        }
+    }
 
     fun userDetail(userId: String) {
         if (selectedUser != null) {

@@ -69,7 +69,7 @@ class SearchViewModel : ViewModel() {
             }
     }
 
-//    fun fetchOtherUsersPosts(userId: String) {
+    //    fun fetchOtherUsersPosts(userId: String) {
 //        _loading.value = true
 //        firestore.collection("Posts")
 //            .whereNotEqualTo("userId", userId)
@@ -96,10 +96,10 @@ class SearchViewModel : ViewModel() {
 //                _loading.value = false
 //            }
 //    }
-fun fetchOtherUsersPosts(userId: String) {
-    viewModelScope.launch(Dispatchers.IO) {
-        _loading.postValue(true)
-        try {
+    fun fetchOtherUsersPosts(userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _loading.postValue(true)
+            try {
                 val postList = mutableListOf<Post>()
                 val currentUserUid = Firebase.auth.currentUser?.uid
                 val value = firestore.collection("Posts").get()
@@ -107,31 +107,25 @@ fun fetchOtherUsersPosts(userId: String) {
 
                         for (postDoc in it.documents) {
                             val postUserId = postDoc.getString(ConstValues.USER_ID) ?: ""
-                            if (currentUserUid != null ) {
+                            if (currentUserUid != null) {
                                 val caption = postDoc.getString(ConstValues.CAPTION) ?: ""
                                 val postId = postDoc.getString(ConstValues.POST_ID) ?: ""
                                 val time = postDoc.getTimestamp(ConstValues.TIME)
                                 val imageUrl = postDoc.getString(ConstValues.POST_IMAGE_URL) ?: ""
-                                val post = Post(caption,postId, postUserId, time, imageUrl)
+                                val post = Post(caption, postId, postUserId, time, imageUrl)
 
-                                if (postUserId!=currentUserUid)   postList.add(post)
+                                if (postUserId != currentUserUid) postList.add(post)
                             }
                         }
-
-//                    .whereNotEqualTo("userId", userId)
-//                    .get()
-//                    .await()
-
-
-                _postResult.postValue(Resource.Success(postList))
+                        _postResult.postValue(Resource.Success(postList))
+                    }
+            } catch (exception: Exception) {
+                _postResult.postValue(Resource.Error(exception))
+            } finally {
+                _loading.postValue(false)
             }
-        } catch (exception: Exception) {
-            _postResult.postValue(Resource.Error(exception))
-        } finally {
-            _loading.postValue(false)
         }
     }
-}
 
 //    suspend fun checkIsFollowing(userId: String): Boolean {
 //        var isFollowing = false

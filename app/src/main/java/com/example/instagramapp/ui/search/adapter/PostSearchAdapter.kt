@@ -1,6 +1,7 @@
 package com.example.instagramapp.ui.search.adapter
 
 import Post
+import android.content.ContentValues
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,11 +9,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.instagramapp.ConstValues
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.PostItemBinding
 import com.example.instagramapp.databinding.SearchPostItemBinding
 import com.example.instagramapp.ui.search.model.Users
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -20,7 +23,8 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PostSearchAdapter(
-    private val itemClick: (item: Post) -> Unit
+    private val itemClick: (item: Post) -> Unit,
+    private val commentButtonClick: (postId: String) -> Unit
 ) : RecyclerView.Adapter<PostSearchAdapter.PostViewHolder>() {
 
 
@@ -54,11 +58,23 @@ class PostSearchAdapter(
                 .load(post.postImageUrl)
                 .into(binding.imgPost)
 
-            binding.txtUsername2.text = username
-            binding.txtUsername.text = username
+//            binding.txtUsername2.text = username
+//            binding.txtUsername.text = username
             binding.txtCaption.text = post.caption
-            fetchUserProfile(username)
+            //fetchUserProfile(username)
 
+            fetchCommentCount(post.postId)
+
+            binding.btnComment.setOnClickListener {
+                commentButtonClick(post.postId)
+            }
+            binding.txtComment.setOnClickListener {
+                commentButtonClick(post.postId)
+            }
+
+
+
+            fetchUsername(post.userId)
             val timestamp = post.time?.toDate()
 
             timestamp?.let {
@@ -105,6 +121,66 @@ class PostSearchAdapter(
 
             checkSaveStatus(post.postId, binding.btnSaved)
         }
+
+        private fun fetchCommentCount(postId: String) {
+            firestore.collection("Comments").document(postId)
+                .get()
+                .addOnSuccessListener { documentSnapshot ->
+                    val comments = documentSnapshot.data?.size ?: 0
+
+                    val commentText = "View all $comments comments"
+                    binding.txtComment.text = commentText
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("PostSearchAdapter", "Error getting comment count: $exception")
+                }
+        }
+
+        fun fetchUsername(userId: String) {
+            firestore.collection("Users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener { documentSnapshot ->
+                    val user = documentSnapshot.toUser()
+                    val username = user?.username ?: ""
+                    binding.txtUsername.text = username
+                    binding.txtUsername2.text = username
+                    Glide.with(binding.root)
+                        .load(user?.imageUrl)
+                        .into(binding.imgProfile)
+
+                }
+                .addOnFailureListener { exception ->
+                    Log.e(
+                        ContentValues.TAG,
+                        "Failed to fetch username: ${exception.message}",
+                        exception
+                    )
+                }
+        }
+
+        private fun DocumentSnapshot.toUser(): Users? {
+            return try {
+                val userId = getString(ConstValues.USER_ID)
+                val username = getString(ConstValues.USERNAME)
+                val email = getString(ConstValues.EMAIL)
+                val password = getString(ConstValues.PASSWORD)
+                val bio = getString(ConstValues.BIO)
+                val imageUrl = getString(ConstValues.IMAGE_URL)
+
+                Users(
+                    userId ?: "",
+                    username ?: "",
+                    email ?: "",
+                    password ?: "",
+                    bio ?: "",
+                    imageUrl ?: ""
+                )
+            } catch (e: Exception) {
+                null
+            }
+        }
+
 
         //like
         private fun toggleLikeStatus(postId: String, imageView: ImageView) {
@@ -211,23 +287,24 @@ class PostSearchAdapter(
                 }
         }
 
+
         //save
 
-        private fun addSaveToFirebase(postId: String){
+        private fun addSaveToFirebase(postId: String) {
             val savedData = hashMapOf(
                 postId to true
             )
             firestore.collection("Saves").document(auth.currentUser!!.uid)
-                .set(savedData,SetOptions.merge())
+                .set(savedData, SetOptions.merge())
                 .addOnSuccessListener {
-                Log.d("addSavedToFirestore", "Save added successfully")
-            }
+                    Log.d("addSavedToFirestore", "Save added successfully")
+                }
                 .addOnFailureListener { exception ->
                     Log.e("addSavedToFirestore", "Error adding save: $exception")
                 }
         }
 
-        private fun removeSaveFromFirestore(postId: String){
+        private fun removeSaveFromFirestore(postId: String) {
             firestore.collection("Saves").document(auth.currentUser!!.uid)
                 .update(postId, FieldValue.delete())
                 .addOnSuccessListener {
@@ -274,9 +351,9 @@ class PostSearchAdapter(
                 addSaveToFirebase(postId)
             }
         }
-        }
-
     }
+
+}
 
 //        private fun shareWithWp(post: Post){
 //            val shareText="Check this post: ${post.postImageUrl}"

@@ -34,6 +34,9 @@ class PostDetailViewModel : ViewModel() {
     private val _userInformation = MutableLiveData<Resource<Users>>()
     val userInformation: LiveData<Resource<Users>>
         get() = _userInformation
+    private val _commentCount = MutableLiveData<Resource<Int>>()
+    val commentCount: LiveData<Resource<Int>>
+        get() = _commentCount
 
     private val _postInformation = MutableLiveData<Resource<Post>>()
     val postInformation: LiveData<Resource<Post>>
@@ -42,8 +45,6 @@ class PostDetailViewModel : ViewModel() {
     private val _loading = MutableLiveData<Boolean>()
     val loading: LiveData<Boolean>
         get() = _loading
-
-
 
 
     private val _postResult = MutableLiveData<Resource<Post>>()
@@ -73,7 +74,22 @@ class PostDetailViewModel : ViewModel() {
             }
     }
 
-    fun fetchUserInformation(userId:String) {
+    fun fetchCommentCount(postId: String) {
+        firestore.collection("Comments").document(postId)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                val comments = documentSnapshot.data?.size ?: 0
+
+                _commentCount.postValue(Resource.Success(comments))
+            }
+            .addOnFailureListener { exception ->
+                _commentCount.postValue(Resource.Error(exception))
+
+                Log.e("PostSearchAdapter", "Error getting comment count: $exception")
+            }
+    }
+
+    fun fetchUserInformation(userId: String) {
         _userInformation.postValue(Resource.Loading)
         firestore.collection("Users")
             .document(userId)
@@ -94,6 +110,7 @@ class PostDetailViewModel : ViewModel() {
                 _userInformation.postValue(Resource.Error(exception))
             }
     }
+
     private fun DocumentSnapshot.toUser(): Users? {
         return try {
             val userId = getString(ConstValues.USER_ID)
@@ -201,12 +218,12 @@ class PostDetailViewModel : ViewModel() {
     }
     //save
 
-     fun addSaveToFirebase(postId: String){
+    fun addSaveToFirebase(postId: String) {
         val savedData = hashMapOf(
             postId to true
         )
         firestore.collection("Saves").document(auth)
-            .set(savedData,SetOptions.merge())
+            .set(savedData, SetOptions.merge())
             .addOnSuccessListener {
                 Log.d("addSavedToFirestore", "Save added successfully")
             }
@@ -215,7 +232,7 @@ class PostDetailViewModel : ViewModel() {
             }
     }
 
-     fun removeSaveFromFirestore(postId: String){
+    fun removeSaveFromFirestore(postId: String) {
         firestore.collection("Saves").document(auth)
             .update(postId, FieldValue.delete())
             .addOnSuccessListener {
@@ -226,7 +243,7 @@ class PostDetailViewModel : ViewModel() {
             }
     }
 
-     fun checkSaveStatus(postId: String, imageView: ImageView) {
+    fun checkSaveStatus(postId: String, imageView: ImageView) {
         firestore.collection("Saves").document(auth).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
@@ -263,7 +280,7 @@ class PostDetailViewModel : ViewModel() {
         }
     }
 
-companion object {
+    companion object {
         private const val TAG = "PostDetailViewModel"
     }
 }

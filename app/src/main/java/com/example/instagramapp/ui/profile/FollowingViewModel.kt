@@ -26,14 +26,20 @@ class FollowingViewModel : ViewModel() {
         firestore.collection("Follow").document(userId)
             .get()
             .addOnSuccessListener { documentSnapshot ->
-                val follow = documentSnapshot.data
-                if (follow != null) {
-                    val followingMap = follow["following"] as? HashMap<String, Boolean>
-                    val followingIds = followingMap?.keys?.toList() ?: emptyList()
+                try {
 
-                    fetchUserDetails(followingIds)
-                } else {
-                    _followingList.value = Resource.Error(Exception("No following found"))
+                    val follow = documentSnapshot.data
+                    if (follow != null) {
+                        val followingMap = follow["following"] as? HashMap<String, Boolean>
+                        val followingIds = followingMap?.keys?.toList() ?: emptyList()
+
+                        fetchUserDetails(followingIds)
+                    } else {
+                        _followingList.value = Resource.Error(Exception("No following found"))
+                        _loading.value = false
+                    }
+                } catch (e: Exception) {
+                    _followingList.value = Resource.Error(e)
                     _loading.value = false
                 }
             }

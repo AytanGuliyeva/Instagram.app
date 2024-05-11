@@ -58,30 +58,6 @@ class UserDetailViewModel : ViewModel() {
         _isFollowing.value = false
     }
 
-/*
-    fun fetchPosts(userId: String) {
-        _loading.postValue(true)
-        firestore.collection("Posts").get()
-            .addOnSuccessListener { querySnapshot ->
-                val postList = mutableListOf<Post>()
-                val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-                for (document in querySnapshot.documents) {
-                    val post = document.toObject(Post::class.java)
-                    post?.let {
-                        val formattedTimestamp = dateFormat.format(post.time!!.toDate())
-                        val postWithFormattedTime = post.copy(time = Timestamp(Date(formattedTimestamp)))
-                        if (userId==it.userId) postList.add(postWithFormattedTime)
-                    }
-                }
-                _postResult.postValue(Resource.Success(postList))
-            }
-            .addOnFailureListener { exception ->
-                Log.e(TAG, "Failed! ${exception.message}", exception)
-            }
-    }
-*/
-
-
     fun fetchPosts(userId: String) {
         _loading.postValue(true)
         firestore.collection("Posts").get()
@@ -108,35 +84,42 @@ class UserDetailViewModel : ViewModel() {
 
     fun fetchFollowersCount(userId: String) {
         firestore.collection("Follow").document(userId)
-            .get()
-            .addOnSuccessListener { documentSnapshot ->
-                val follow = documentSnapshot.data
-                if (follow != null) {
-                    val followers = (follow["followers"] as? HashMap<*, *>)?.size ?: 0
-                    _followersCount.postValue(followers)
-                } else {
-                    _followersCount.postValue(0)
+            .addSnapshotListener { documentSnapshot, error ->
+                if (error != null) {
+                    error.localizedMessage?.let {
+                        return@addSnapshotListener
+                    }
+                }
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    val follow = documentSnapshot.data
+                    if (follow != null) {
+                        val followers = (follow["followers"] as? HashMap<*, *>)?.size ?: 0
+                        _followersCount.postValue(followers)
+                    } else {
+                        _followersCount.postValue(0)
+                    }
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.e("UserDetailViewModel", "Error getting followers count: $exception")
-            }
+
     }
 
-     fun fetchFollowingCount(userId: String) {
+    fun fetchFollowingCount(userId: String) {
         firestore.collection("Follow").document(userId)
-            .get()
-            .addOnSuccessListener { documentSnapshot ->
-                val follow = documentSnapshot.data
-                if (follow != null) {
-                    val following = (follow["following"] as? HashMap<*, *>)?.size ?: 0
-                    _followingCount.postValue(following)
-                } else {
-                    _followingCount.postValue(0)
+            .addSnapshotListener { documentSnapshot, error ->
+                if (error != null) {
+                    error.localizedMessage?.let {
+                        return@addSnapshotListener
+                    }
                 }
-            }
-            .addOnFailureListener { exception ->
-                Log.e("UserDetailViewModel", "Error getting following count: $exception")
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    val follow = documentSnapshot.data
+                    if (follow != null) {
+                        val following = (follow["following"] as? HashMap<*, *>)?.size ?: 0
+                        _followingCount.postValue(following)
+                    } else {
+                        _followingCount.postValue(0)
+                    }
+                }
             }
     }
 
@@ -152,10 +135,6 @@ class UserDetailViewModel : ViewModel() {
                     FieldValue.delete()
                 ).addOnSuccessListener {
                     _isFollowing.postValue(false)
-                    fetchFollowingCount(userId)
-                    fetchFollowingCount(auth)
-                    fetchFollowersCount(userId)
-                    fetchFollowersCount(auth)
                 }.addOnFailureListener { exception ->
                     Log.e("UserDetailViewModel", "Error updating follower data: $exception")
                 }
@@ -176,10 +155,6 @@ class UserDetailViewModel : ViewModel() {
                         .set(mapOf("followers" to follower), SetOptions.merge())
                         .addOnSuccessListener {
                             _isFollowing.postValue(true)
-                            fetchFollowingCount(userId)
-                            fetchFollowingCount(auth)
-                            fetchFollowersCount(userId)
-                            fetchFollowersCount(auth)
                         }.addOnFailureListener { exception ->
                             Log.e("UserDetailViewModel", "Error updating follower data: $exception")
                         }

@@ -44,8 +44,8 @@ class FollowFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val userId = args.userId
 
-        followerFragment=FollowerFragment()
-        followingFragment=FollowingFragment()
+        followerFragment = FollowerFragment()
+        followingFragment = FollowingFragment()
         val followerArgs = Bundle().also {
             it.putString("userId", userId)
         }
@@ -56,12 +56,14 @@ class FollowFragment : Fragment() {
         fragmentList.add(followingFragment.also {
             it.arguments = followerArgs
         })
-        Log.e("TAG", "onCreate: $userId", )
+        Log.e("TAG", "onCreate: $userId")
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = PagerAdapter(childFragmentManager, lifecycle,followerFragment,followingFragment)
+        val adapter =
+            PagerAdapter(childFragmentManager, lifecycle, followerFragment, followingFragment)
         binding.viewPager.adapter = adapter
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
@@ -71,70 +73,9 @@ class FollowFragment : Fragment() {
             }
         }.attach()
 
-//        setupRecyclerView(binding.rvFollower)
-//        setupRecyclerView(binding.rvFollowing)
-
         btnBack()
-
-//        viewModel.fetchFollowers(args.userId)
-//        viewModel.fetchFollowing(args.userId)
-//        observeFollowers()
-//        observeFollowings()
-
-
-
-
-
     }
 
-//    private fun observeFollowers() {
-//        viewModel.followerResult.observe(viewLifecycleOwner) { resource ->
-//            when (resource) {
-//                is Resource.Success -> {
-//                    userAdapter.submitList(resource.data)
-//                }
-//                is Resource.Loading -> {
-//                    // Show loading indicator if needed
-//                }
-//                is Resource.Error -> {
-//                    // Handle error if needed
-//                }
-//            }
-//        }
-//    }
-//
-//    private fun observeFollowings() {
-//        viewModel.followingResult.observe(viewLifecycleOwner) { resource ->
-//            when (resource) {
-//                is Resource.Success -> {
-//                    userAdapter.submitList(resource.data)
-//                }
-//                is Resource.Loading -> {
-//                    // Show loading indicator if needed
-//                }
-//                is Resource.Error -> {
-//                    // Handle error if needed
-//                }
-//            }
-//        }
-//    }
-//
-//    private fun setupRecyclerView(recyclerView: RecyclerView) {
-//        userAdapter = UserAdapter(
-//            itemClick = {
-//                //electedUser=it;userDetail(selectedUser!!.userId)
-//            }
-//        )
-//        recyclerView.adapter = userAdapter
-//    }
-//
-//    private fun userDetail(userId: String) {
-//        if (selectedUser != null) {
-//            val action = SearchFragmentDirections.actionSearchFragmentToUserDetailFragment(userId)
-//            findNavController().navigate(action)
-//        }
-//    }
-//
     private fun btnBack() {
         binding.btnBack.setOnClickListener {
             val action = FollowFragmentDirections.actionFollowFragmentToProfileFragment()

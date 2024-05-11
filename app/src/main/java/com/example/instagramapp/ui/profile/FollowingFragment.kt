@@ -21,9 +21,9 @@ class FollowingFragment : Fragment() {
     private lateinit var userId: String
 
     private lateinit var userAdapter: UserAdapter
-     private  val viewModel: FollowingViewModel by viewModels()
+    private val viewModel: FollowingViewModel by viewModels()
     private var selectedUser: Users? = null
-  //  val args: FollowingFragmentArgs by navArgs()
+    //  val args: FollowingFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,19 +62,19 @@ class FollowingFragment : Fragment() {
 
     private fun setupRecyclerView() {
         userAdapter = UserAdapter(
-                itemClick = {
-                    selectedUser = it
-                    userDetail(it.userId)
-                }
+            itemClick = {
+                selectedUser = it
+                //1 userDetail(it.userId)
+            }
         )
         binding.rvFollowing.adapter = userAdapter
     }
 
-    fun userDetail(userId: String) {
-        if (selectedUser != null) {
-            val action = FollowingFragmentDirections.actionFollowingFragmentToUserDetailFragment(userId)
-            findNavController().navigate(action)
-        }
-    }
+//    fun userDetail(userId: String) {
+//        if (selectedUser != null) {
+//            val action = FollowingFragmentDirections.actionFollowingFragmentToUserDetailFragment(userId)
+//            findNavController().navigate(action)
+//        }
+//    }
 
 }

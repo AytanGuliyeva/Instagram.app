@@ -25,9 +25,7 @@ class UserDetailFragment : Fragment() {
     private val viewModel: UserDetailViewModel by viewModels()
     private lateinit var postAdapter: PostAdapter
     val args: UserDetailFragmentArgs by navArgs()
-    private var selectedPost:Post?=null
-
-
+    private var selectedPost: Post? = null
 
 
     override fun onCreateView(
@@ -65,46 +63,49 @@ class UserDetailFragment : Fragment() {
         viewModel.postResult.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    if (resource.data.isEmpty()){
+                    if (resource.data.isEmpty()) {
                         binding.txtNoPost.visibility = View.VISIBLE
-                        binding.imgCamera.visibility=View.VISIBLE
+                        binding.imgCamera.visibility = View.VISIBLE
                     } else {
                         binding.txtNoPost.visibility = View.GONE
-                        binding.imgCamera.visibility=View.GONE
+                        binding.imgCamera.visibility = View.GONE
                     }
                     postAdapter.submitList(resource.data)
-                    binding.progressBar.visibility=View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
+
                 is Resource.Error -> {
-                    binding.progressBar.visibility=View.GONE
+                    binding.progressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), "Error occurred!", Toast.LENGTH_SHORT).show()
                 }
+
                 is Resource.Loading -> {
-                    binding.progressBar.visibility=View.VISIBLE
+                    binding.progressBar.visibility = View.VISIBLE
                 }
             }
         }
-        viewModel.postSize.observe(viewLifecycleOwner){ postCount ->
+        viewModel.postSize.observe(viewLifecycleOwner) { postCount ->
             binding.txtPostCount.text = postCount.toString()
         }
         btnFollow()
         btnBack()
     }
 
-    private fun observeUserResult(){
-        viewModel.userInformation.observe(viewLifecycleOwner){
-                resource ->
+    private fun observeUserResult() {
+        viewModel.userInformation.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     val user = resource.data
                     updateUserUI(user)
-                    binding.progressBar.visibility=View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
+
                 is Resource.Loading -> {
-                    binding.progressBar.visibility=View.VISIBLE
+                    binding.progressBar.visibility = View.VISIBLE
                 }
+
                 is Resource.Error -> {
-                    binding.progressBar.visibility=View.GONE
+                    binding.progressBar.visibility = View.GONE
                 }
             }
         }
@@ -113,16 +114,21 @@ class UserDetailFragment : Fragment() {
 
     private fun setupRecyclerView() {
         postAdapter = PostAdapter(itemClick = {
-            selectedPost=it;postDetail(selectedPost!!.postId,selectedPost!!.userId)
+            selectedPost = it;postDetail(selectedPost!!.postId, selectedPost!!.userId)
         })
         binding.rvPost.adapter = postAdapter
     }
-    fun postDetail(postId:String,userId:String){
-        if (selectedPost !=null){
-            val action= UserDetailFragmentDirections.actionUserDetailFragmentToPostDetailFragment(postId,userId)
+
+    fun postDetail(postId: String, userId: String) {
+        if (selectedPost != null) {
+            val action = UserDetailFragmentDirections.actionUserDetailFragmentToPostDetailFragment(
+                postId,
+                userId
+            )
             findNavController().navigate(action)
         }
     }
+
     private fun observeFollowerCount() {
         viewModel.followersCount.observe(viewLifecycleOwner) { followersCount ->
             binding.txtFollowersCount.text = followersCount.toString()
@@ -134,32 +140,38 @@ class UserDetailFragment : Fragment() {
             binding.txtFollowingCount.text = followingCount.toString()
         }
     }
+
     private fun updateUserUI(user: Users) {
         binding.txtUsername.text = user.username
-        binding.txtUsername2.text=user.bio
+        binding.txtUsername2.text = user.bio
         Glide.with(binding.root)
             .load(user.imageUrl)
             .into(binding.imgProfile)
 
     }
-    private fun btnBack(){
+
+    private fun btnBack() {
         binding.btnBack.setOnClickListener {
-            val action=UserDetailFragmentDirections.actionUserDetailFragmentToSearchFragment()
+            val action = UserDetailFragmentDirections.actionUserDetailFragmentToSearchFragment()
             findNavController().navigate(action)
         }
     }
+
     private fun btnFollow() {
         binding.btnFollow.setOnClickListener {
             viewModel.followClickListener(args.userId)
         }
     }
-    private fun follow(){
+
+    private fun follow() {
         binding.txtFollowingCount.setOnClickListener {
-            val action = UserDetailFragmentDirections.actionUserDetailFragmentToFollowFragment(args.userId)
+            val action =
+                UserDetailFragmentDirections.actionUserDetailFragmentToFollowFragment(args.userId)
             findNavController().navigate(action)
         }
         binding.txtFollowersCount.setOnClickListener {
-            val action = UserDetailFragmentDirections.actionUserDetailFragmentToFollowFragment(args.userId)
+            val action =
+                UserDetailFragmentDirections.actionUserDetailFragmentToFollowFragment(args.userId)
             findNavController().navigate(action)
         }
     }

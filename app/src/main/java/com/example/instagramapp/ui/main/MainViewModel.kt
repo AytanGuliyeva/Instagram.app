@@ -21,8 +21,8 @@ import java.util.Locale
 class MainViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
 
-    private val _postResult = MutableLiveData<Resource<List<Post>>>()
-    val postResult: LiveData<Resource<List<Post>>>
+    private val _postResult = MutableLiveData<Resource<List<Pair<Post,String>>>>()
+    val postResult: LiveData<Resource<List<Pair<Post,String>>>>
         get() = _postResult
 
     private val _loading = MutableLiveData<Boolean>()
@@ -33,6 +33,9 @@ class MainViewModel : ViewModel() {
     val userList: LiveData<Resource<List<Users>>>
         get() = _userList
 
+    init{
+        fetchPosts()
+    }
     fun fetchPosts() {
         _loading.postValue(true)
         val currentUserUid = Firebase.auth.currentUser?.uid
@@ -47,20 +50,17 @@ class MainViewModel : ViewModel() {
                                 .whereIn("userId", followingUserIds.toList())
                                 .get()
                                 .addOnSuccessListener { querySnapshot ->
-                                    val postList = mutableListOf<Post>()
+                                    val postList = mutableListOf<Pair<Post,String>>()
                                     val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
                                     for (document in querySnapshot.documents) {
                                         val post = document.toObject(Post::class.java)
                                         post?.let {
                                            // val formattedTimestamp = post.time
 
-//                                            val formattedTimestamp = dateFormat.format(post.time!!.toDate())
-//                                            val postWithFormattedTime = post.copy(time = Timestamp(Date(formattedTimestamp)))
-//                                            postList.add(postWithFormattedTime)
                                             val formattedTimestamp = post.time?.toDate()
                                             if (formattedTimestamp != null) {
                                                 val postWithFormattedTime = post.copy(time = Timestamp(formattedTimestamp))
-                                                postList.add(postWithFormattedTime)
+                                                postList.add(Pair(postWithFormattedTime,""))
                                             } else {
                                                 // Handle the case where post.time is null
                                             }
@@ -88,18 +88,16 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun fetchUsername(userId: String, callback: (String) -> Unit) {
+    fun fetchUsername(userId: String, post: Post) {
         firestore.collection("Users")
             .document(userId)
             .get()
             .addOnSuccessListener { documentSnapshot ->
                 val user = documentSnapshot.toUser()
                 val username = user?.username ?: ""
-                callback(username)
             }
             .addOnFailureListener { exception ->
                 Log.e(TAG, "Failed to fetch username: ${exception.message}", exception)
-                callback("")
             }
     }
 

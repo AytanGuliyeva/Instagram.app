@@ -95,5 +95,8 @@
     <string name="personal_information_settings">Personal information settings</string>
     <string name="sign_up_for_meta_verified">Sign up for Meta Verified</string>
     <string name="done">Done</string>
+    <string name="comments">Comments</string>
+    <string name="h">h</string>
+    <string name="add_a_comment">add a comment...</string>
 
 </resources>
