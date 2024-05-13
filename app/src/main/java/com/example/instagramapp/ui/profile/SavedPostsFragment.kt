@@ -8,7 +8,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentSavedPostsBinding
+import com.example.instagramapp.ui.main.CommentsBottomSheetFragment
 import com.example.instagramapp.ui.search.adapter.PostSearchAdapter
 import com.example.instagramapp.util.Resource
 
@@ -45,7 +47,6 @@ class SavedPostsFragment : Fragment() {
                 }
 
                 is Resource.Error -> {
-                    // Handle error scenario
                     Toast.makeText(
                         requireContext(),
                         "Error: ${resource.exception}",
@@ -58,17 +59,39 @@ class SavedPostsFragment : Fragment() {
 
     private fun btnBack() {
         binding.btnBack.setOnClickListener {
-            val action = SavedPostsFragmentDirections.actionSavedPostsFragmentToSettingFragment()
-            findNavController().navigate(action)
+            findNavController().popBackStack() //TODO migrate back button callbacks to popbackstack
         }
     }
 
     private fun setupRecyclerView() {
         postAdapter = PostSearchAdapter(itemClick = {
             // selectedPost = it;postDetail(selectedPost!!.postId, selectedPost!!.userId)
-        }, commentButtonClick = { //postId ->
-//            val bottomSheet = CommentsBottomSheetFragment.newInstance(postId)
-//            bottomSheet.show(childFragmentManager, bottomSheet.tag)
+        }, commentButtonClick = {postId ->
+            val bottomSheet = CommentsBottomSheetFragment.newInstance(postId)
+            bottomSheet.show(childFragmentManager, bottomSheet.tag)
+        }, likeButtonClick = { postId, imageView ->
+            val tag = imageView.tag?.toString() ?: ""
+            if (tag == "liked") {
+                viewModel.toggleLikeStatus(postId, tag)
+                imageView.setImageResource(R.drawable.like_icon)
+                imageView.tag = "like"
+            } else {
+                viewModel.toggleLikeStatus(postId, tag)
+                imageView.setImageResource(R.drawable.icon_liked)
+                imageView.tag = "liked"
+            }
+        }, saveButtonClick = { postId, imageView ->
+            val tag = imageView.tag?.toString() ?: ""
+            if (tag == "saved") {
+                viewModel.toggleSaveStatus(postId, tag)
+                imageView.setImageResource(R.drawable.save_icon)
+                imageView.tag = "save"
+            } else {
+                viewModel.toggleSaveStatus(postId, tag)
+                imageView.setImageResource(R.drawable.icons8_saved_icon)
+                imageView.tag = "saved"
+
+            }
         })
         binding.rvSaved.adapter = postAdapter
     }

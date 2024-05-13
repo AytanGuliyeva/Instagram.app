@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RadioButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -13,6 +14,7 @@ import com.example.instagramapp.ConstValues
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.PostItemBinding
 import com.example.instagramapp.databinding.SearchPostItemBinding
+import com.example.instagramapp.ui.search.model.LikeCount
 import com.example.instagramapp.ui.search.model.Users
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -24,15 +26,26 @@ import java.util.Locale
 
 class PostSearchAdapter(
     private val itemClick: (item: Post) -> Unit,
-    private val commentButtonClick: (postId: String) -> Unit
-) : RecyclerView.Adapter<PostSearchAdapter.PostViewHolder>() {
+    private val commentButtonClick: (postId: String) -> Unit,
+    private val likeButtonClick: (postId: String, imageView: ImageView) -> Unit,
+    private var likeCountList: List<LikeCount> = emptyList(),
+    private val saveButtonClick: (postId: String, imageView: ImageView) -> Unit,
 
+    ) : RecyclerView.Adapter<PostSearchAdapter.PostViewHolder>() {
 
     private var postWithUsernames: List<Pair<Post, String>> = emptyList()
+
+    //TODO migrate repos from adapter to viewmodel and fragment
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     fun submitList(posts: List<Pair<Post, String>>) {
         postWithUsernames = posts
+        //TODO move data to constructor
+        notifyDataSetChanged()
+    }
+
+    fun updateLikeCount(likeCountList: List<LikeCount>) {
+        this.likeCountList = likeCountList
         notifyDataSetChanged()
     }
 
@@ -57,14 +70,8 @@ class PostSearchAdapter(
             Glide.with(binding.root)
                 .load(post.postImageUrl)
                 .into(binding.imgPost)
-
-//            binding.txtUsername2.text = username
-//            binding.txtUsername.text = username
             binding.txtCaption.text = post.caption
-            //fetchUserProfile(username)
-
             fetchCommentCount(post.postId)
-
             binding.btnComment.setOnClickListener {
                 commentButtonClick(post.postId)
             }
@@ -72,18 +79,13 @@ class PostSearchAdapter(
                 commentButtonClick(post.postId)
             }
 
-
-
             fetchUsername(post.userId)
             val timestamp = post.time?.toDate()
-
             timestamp?.let {
                 val currentTime = System.currentTimeMillis()
                 val postTime = it.time
                 val timeDifference = currentTime - postTime
-
                 val minutesAgo = (timeDifference / (1000 * 60)).toInt()
-
                 if (minutesAgo < 1) {
                     binding.txtTime.text = "Just now"
                 } else if (minutesAgo < 60) {
@@ -109,15 +111,38 @@ class PostSearchAdapter(
                 itemClick(post)
             }
             binding.btnLike.setOnClickListener {
-                toggleLikeStatus(post.postId, binding.btnLike)
+                likeButtonClick(post.postId, binding.btnLike)
             }
 
-            checkLikeStatus(post.postId, binding.btnLike)
-            likeCount(binding.txtLikes, post.postId)
-
+            // checkLikeStatus(post.postId, binding.btnLike)
+            if (post.isLiked) {
+                binding.btnLike.setImageResource(R.drawable.icon_liked)
+                binding.btnLike.tag = "liked"
+            } else {
+                binding.btnLike.setImageResource(R.drawable.like_icon)
+                binding.btnLike.tag = "like"
+            }
+           likeCount(binding.txtLikes, post.postId)
             binding.btnSaved.setOnClickListener {
-                toggleSaveStatus(post.postId, binding.btnSaved)
+                saveButtonClick(post.postId, binding.btnSaved)
             }
+
+//            if (post.isLiked) {
+//                binding.btnLike.setImageResource(R.drawable.icon_liked)
+//                binding.btnLike.tag = "liked"
+//            } else {
+//                binding.btnLike.setImageResource(R.drawable.like_icon)
+//                binding.btnLike.tag = "like"
+//            }
+//            val currentLikeCount=likeCountList.find {
+//                it.postId == post.postId
+//            }
+//            if (currentLikeCount!=null){
+//                binding.txtLikes.text=currentLikeCount.likeCount.toString()
+//            }
+//            binding.btnSaved.setOnClickListener {
+//                toggleSaveStatus(post.postId, binding.btnSaved)
+//            }
 
             checkSaveStatus(post.postId, binding.btnSaved)
         }
@@ -148,7 +173,6 @@ class PostSearchAdapter(
                     Glide.with(binding.root)
                         .load(user?.imageUrl)
                         .into(binding.imgProfile)
-
                 }
                 .addOnFailureListener { exception ->
                     Log.e(
@@ -169,34 +193,19 @@ class PostSearchAdapter(
                 val imageUrl = getString(ConstValues.IMAGE_URL)
 
                 Users(
-                    userId ?: "",
-                    username ?: "",
-                    email ?: "",
-                    password ?: "",
-                    bio ?: "",
-                    imageUrl ?: ""
+                    userId.orEmpty(),
+                    username.orEmpty(),
+                    email.orEmpty(),
+                    password.orEmpty(),
+                    bio.orEmpty(),
+                    imageUrl.orEmpty(),
                 )
             } catch (e: Exception) {
                 null
             }
         }
 
-
         //like
-        private fun toggleLikeStatus(postId: String, imageView: ImageView) {
-            val tag = imageView.tag?.toString() ?: ""
-
-            if (tag == "liked") {
-                imageView.setImageResource(R.drawable.like_icon)
-                imageView.tag = "like"
-                removeLikeFromFirestore(postId)
-            } else {
-                imageView.setImageResource(R.drawable.icon_liked)
-                imageView.tag = "liked"
-                addLikeToFirestore(postId)
-            }
-        }
-
         private fun likeCount(likes: TextView, postId: String) {
             firestore.collection("Likes").document(postId).addSnapshotListener { value, error ->
                 if (error != null) {
@@ -205,13 +214,7 @@ class PostSearchAdapter(
                 }
                 if (value != null && value.exists()) {
                     val likesCount = value.data?.size ?: 0
-                    val likesString = if (likesCount == 0) {
-                        "0 likes"
-                    } else if (likesCount == 1) {
-                        "1 like"
-                    } else {
-                        "$likesCount likes"
-                    }
+                    val likesString = "$likesCount likes"
                     likes.text = likesString
                 } else {
                     likes.text = "0 likes"
@@ -219,101 +222,75 @@ class PostSearchAdapter(
             }
         }
 
-        private fun checkLikeStatus(postId: String, imageView: ImageView) {
-            firestore.collection("Likes").document(postId).get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        val likedByCurrentUser =
-                            document.getBoolean(auth.currentUser!!.uid) ?: false
-                        if (likedByCurrentUser) {
-                            imageView.setImageResource(R.drawable.icon_liked)
-                            imageView.tag = "liked"
-                        } else {
-                            imageView.setImageResource(R.drawable.like_icon)
-                            imageView.tag = "like"
-                        }
-                    } else {
-                        imageView.setImageResource(R.drawable.like_icon)
-                        imageView.tag = "like"
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("checkLikeStatus", "Error checking like status: $exception")
-                }
-        }
+//        private fun checkLikeStatus(postId: String, imageView: ImageView) {
+//            firestore.collection("Likes").document(postId).get()
+//                .addOnSuccessListener { document ->
+//                    if (document.exists()) {
+//                        val likedByCurrentUser =
+//                            document.getBoolean(auth.currentUser!!.uid) ?: false
+//                        if (likedByCurrentUser) {
+//                            imageView.setImageResource(R.drawable.icon_liked)
+//                            imageView.tag = "liked"
+//                        } else {
+//                            imageView.setImageResource(R.drawable.like_icon)
+//                            imageView.tag = "like"
+//                        }
+//                    } else {
+//                        imageView.setImageResource(R.drawable.like_icon)
+//                        imageView.tag = "like"
+//                    }
+//                }
+//                .addOnFailureListener { exception ->
+//                    Log.e("checkLikeStatus", "Error checking like status: $exception")
+//                }
+//        }
 
-        private fun addLikeToFirestore(postId: String) {
-            val likeData = hashMapOf(
-                auth.currentUser!!.uid to true
-            )
-            firestore.collection("Likes").document(postId).set(likeData, SetOptions.merge())
-                .addOnSuccessListener {
-                    Log.d("addLikeToFirestore", "Like added successfully")
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("addLikeToFirestore", "Error adding like: $exception")
-                }
-        }
-
-        private fun removeLikeFromFirestore(postId: String) {
-            firestore.collection("Likes").document(postId)
-                .update(auth.currentUser!!.uid, FieldValue.delete())
-                .addOnSuccessListener {
-                    Log.d("removeLikeFromFirestore", "Like removed successfully")
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("removeLikeFromFirestore", "Error removing like: $exception")
-                }
-        }
-
-        //for image url
-        private fun fetchUserProfile(username: String) {
-            firestore.collection("Users")
-                .whereEqualTo("username", username)
-                .get()
-                .addOnSuccessListener { querySnapshot ->
-                    if (!querySnapshot.isEmpty) {
-                        val userDocument = querySnapshot.documents[0]
-                        val user = userDocument.toObject(Users::class.java)
-                        user?.let {
-                            Glide.with(binding.root)
-                                .load(it.imageUrl)
-                                .into(binding.imgProfile)
-                        }
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("fetchUserProfile", "Error fetching user profile: $exception")
-                }
-        }
-
+//        //for image url
+//        private fun fetchUserProfile(username: String) {
+//            firestore.collection("Users")
+//                .whereEqualTo("username", username)
+//                .get()
+//                .addOnSuccessListener { querySnapshot ->
+//                    if (!querySnapshot.isEmpty) {
+//                        val userDocument = querySnapshot.documents[0]
+//                        val user = userDocument.toObject(Users::class.java)
+//                        user?.let {
+//                            Glide.with(binding.root)
+//                                .load(it.imageUrl)
+//                                .into(binding.imgProfile)
+//                        }
+//                    }
+//                }
+//                .addOnFailureListener { exception ->
+//                    Log.e("fetchUserProfile", "Error fetching user profile: $exception")
+//                }
+//        }
 
         //save
-
-        private fun addSaveToFirebase(postId: String) {
-            val savedData = hashMapOf(
-                postId to true
-            )
-            firestore.collection("Saves").document(auth.currentUser!!.uid)
-                .set(savedData, SetOptions.merge())
-                .addOnSuccessListener {
-                    Log.d("addSavedToFirestore", "Save added successfully")
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("addSavedToFirestore", "Error adding save: $exception")
-                }
-        }
-
-        private fun removeSaveFromFirestore(postId: String) {
-            firestore.collection("Saves").document(auth.currentUser!!.uid)
-                .update(postId, FieldValue.delete())
-                .addOnSuccessListener {
-                    Log.d("removeSaveFromFirestore", "Save removed successfully")
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("removeSaveFromFirestore", "Error removing save: $exception")
-                }
-        }
+//        private fun addSaveToFirebase(postId: String) {
+//            val savedData = hashMapOf(
+//                postId to true
+//            )
+//            firestore.collection("Saves").document(auth.currentUser!!.uid)
+//                .set(savedData, SetOptions.merge())
+//                .addOnSuccessListener {
+//                    Log.d("addSavedToFirestore", "Save added successfully")
+//                }
+//                .addOnFailureListener { exception ->
+//                    Log.e("addSavedToFirestore", "Error adding save: $exception")
+//                }
+//        }
+//
+//        private fun removeSaveFromFirestore(postId: String) {
+//            firestore.collection("Saves").document(auth.currentUser!!.uid)
+//                .update(postId, FieldValue.delete())
+//                .addOnSuccessListener {
+//                    Log.d("removeSaveFromFirestore", "Save removed successfully")
+//                }
+//                .addOnFailureListener { exception ->
+//                    Log.e("removeSaveFromFirestore", "Error removing save: $exception")
+//                }
+//        }
 
         private fun checkSaveStatus(postId: String, imageView: ImageView) {
             firestore.collection("Saves").document(auth.currentUser!!.uid).get()
@@ -337,22 +314,20 @@ class PostSearchAdapter(
                 }
         }
 
-
-        private fun toggleSaveStatus(postId: String, imageView: ImageView) {
-            val tag = imageView.tag?.toString() ?: ""
-
-            if (tag == "saved") {
-                imageView.setImageResource(R.drawable.save_icon)
-                imageView.tag = "save"
-                removeSaveFromFirestore(postId)
-            } else {
-                imageView.setImageResource(R.drawable.icons8_saved_icon)
-                imageView.tag = "saved"
-                addSaveToFirebase(postId)
-            }
-        }
+//        private fun toggleSaveStatus(postId: String, imageView: ImageView) {
+//            val tag = imageView.tag?.toString() ?: ""
+//
+//            if (tag == "saved") {
+//                imageView.setImageResource(R.drawable.save_icon)
+//                imageView.tag = "save"
+//                removeSaveFromFirestore(postId)
+//            } else {
+//                imageView.setImageResource(R.drawable.icons8_saved_icon)
+//                imageView.tag = "saved"
+//                addSaveToFirebase(postId)
+//            }
+//        }
     }
-
 }
 
 //        private fun shareWithWp(post: Post){
@@ -369,6 +344,3 @@ class PostSearchAdapter(
 //                Toast.makeText(binding.root.context, "WhatsApp is not installed.", Toast.LENGTH_SHORT).show()
 //            }
 //        }
-
-
-

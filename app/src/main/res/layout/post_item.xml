@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    app:cardElevation="0dp"
     android:layout_height="wrap_content"
     android:layout_margin="10dp">
 
@@ -45,17 +46,24 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.8" />
+
         <ImageView
             android:id="@+id/imgPost"
-            android:layout_width="match_parent"
-            android:layout_height="480dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginTop="10dp"
             android:contentDescription="@string/post"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imgProfile"
-            app:srcCompat="@drawable/ic_launcher_background" />
-
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/guideline"/>
+<!--TODO do not use hardcoded size. Use percent or guideline instead-->
         <ImageButton
             android:id="@+id/btnLike"
             android:layout_width="wrap_content"
@@ -66,7 +74,6 @@
             android:contentDescription="@string/like"
             android:src="@drawable/like_icon"
             app:layout_constraintBottom_toBottomOf="@+id/btnComment"
-            app:layout_constraintEnd_toStartOf="@+id/btnComment"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imgPost" />
 
@@ -77,10 +84,8 @@
             android:layout_marginHorizontal="5dp"
             android:background="@color/white"
             android:layout_marginTop="10dp"
-
             android:contentDescription="@string/comment"
             android:src="@drawable/comment_icon"
-            app:layout_constraintEnd_toStartOf="@+id/btnShare"
             app:layout_constraintStart_toEndOf="@+id/btnLike"
             app:layout_constraintTop_toBottomOf="@id/imgPost" />
 

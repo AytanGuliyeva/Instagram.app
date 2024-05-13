@@ -98,5 +98,8 @@
     <string name="comments">Comments</string>
     <string name="h">h</string>
     <string name="add_a_comment">add a comment...</string>
-
+    <string name="something_gone_wrong">Something gone wrong</string>
+    <string name="please_select_an_image">Please select an image</string>
+    <string name="failed_to_upload_image">Failed to upload image!</string>
+    <string name="Failed">Failed</string>
 </resources>

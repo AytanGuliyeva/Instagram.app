@@ -48,7 +48,11 @@
         android:id="@+id/mainFragment"
         android:name="com.example.instagramapp.ui.main.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" />
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_mainFragment_to_storyFragment"
+            app:destination="@id/storyFragment" />
+    </fragment>
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.example.instagramapp.ui.search.SearchFragment"
@@ -228,4 +232,9 @@
         android:name="com.example.instagramapp.ui.main.CommentsBottomSheetFragment"
         android:label="fragment_comments_bottom_sheet"
         tools:layout="@layout/fragment_comments_bottom_sheet" />
+    <fragment
+        android:id="@+id/storyFragment"
+        android:name="com.example.instagramapp.ui.main.StoryFragment"
+        android:label="fragment_story"
+        tools:layout="@layout/fragment_story" />
 </navigation>

@@ -13,6 +13,7 @@
         >
 
         <ImageView
+            android:id="@+id/iconInsta"
             android:layout_width="130dp"
             android:layout_height="match_parent"
             android:src="@drawable/instagram_wordmark"
@@ -42,6 +43,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvStory"
             android:layout_width="match_parent"
@@ -54,7 +57,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btnLike"
             app:spanCount="1"
-            tools:listitem="@layout/story_item" />
+            tools:listitem="@layout/add_story" />
 
         <ImageView
             android:id="@+id/imgCamera"

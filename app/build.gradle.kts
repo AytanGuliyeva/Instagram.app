@@ -46,6 +46,7 @@ dependencies {
     
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.50")
+    implementation("androidx.activity:activity:1.8.0")
     kapt("com.google.dagger:hilt-android-compiler:2.50")
 
     //navigation component
@@ -81,6 +82,9 @@ dependencies {
 
     //Swiperefreshlayout
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    //story progress bar
+    implementation ("com.github.shts:StoriesProgressView:3.0.0")
 
 
 

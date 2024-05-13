@@ -81,12 +81,12 @@ class FollowingViewModel : ViewModel() {
             val imageUrl = getString(ConstValues.IMAGE_URL)
 
             Users(
-                userId ?: "",
-                username ?: "",
-                email ?: "",
-                password ?: "",
-                bio ?: "",
-                imageUrl ?: ""
+                userId.orEmpty(),
+                username.orEmpty(),
+                email.orEmpty(),
+                password.orEmpty(),
+                bio.orEmpty(),
+                imageUrl.orEmpty(),
             )
         } catch (e: Exception) {
             null
