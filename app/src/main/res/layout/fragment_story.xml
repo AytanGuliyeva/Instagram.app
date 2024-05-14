@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.main.StoryFragment">
+    tools:context=".ui.main.story.StoryFragment">
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
@@ -18,10 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1" />
-
         <View
             android:id="@+id/skip"
-
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1" />
@@ -58,13 +56,12 @@
             android:id="@+id/story_photo"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/profile_photo_default"
             />
         <TextView
             android:id="@+id/story_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Username"
+            android:text=""
             android:layout_marginStart="10dp"
             android:layout_gravity="center"
             />
@@ -82,7 +79,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/profile_photo_default" />
+        />
 
 
     <ImageView
@@ -114,8 +111,4 @@
         android:layout_marginEnd="10dp"
         android:src="@drawable/icon_view"
         />
-
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

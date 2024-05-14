@@ -52,6 +52,9 @@
         <action
             android:id="@+id/action_mainFragment_to_storyFragment"
             app:destination="@id/storyFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_addStoryFragment"
+            app:destination="@id/addStoryFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -229,12 +232,21 @@
     </fragment>
     <dialog
         android:id="@+id/commentsBottomSheetFragment"
-        android:name="com.example.instagramapp.ui.main.CommentsBottomSheetFragment"
+        android:name="com.example.instagramapp.ui.main.comment.CommentsBottomSheetFragment"
         android:label="fragment_comments_bottom_sheet"
         tools:layout="@layout/fragment_comments_bottom_sheet" />
     <fragment
         android:id="@+id/storyFragment"
-        android:name="com.example.instagramapp.ui.main.StoryFragment"
+        android:name="com.example.instagramapp.ui.main.story.StoryFragment"
         android:label="fragment_story"
-        tools:layout="@layout/fragment_story" />
+        tools:layout="@layout/fragment_story" >
+        <argument
+            android:name="userId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/addStoryFragment"
+        android:name="com.example.instagramapp.ui.main.story.AddStoryFragment"
+        android:label="fragment_add_story"
+        tools:layout="@layout/fragment_add_story" />
 </navigation>

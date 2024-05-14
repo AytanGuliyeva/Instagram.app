@@ -1,18 +1,16 @@
-package com.example.instagramapp.ui.main
+package com.example.instagramapp.ui.main.comment
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.example.instagramapp.ConstValues
+import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentCommentsBottomSheetBinding
-import com.example.instagramapp.ui.main.adapters.CommentsAdapter
-import com.example.instagramapp.ui.search.adapter.PostSearchAdapter
+import com.example.instagramapp.ui.main.comment.adapter.CommentsAdapter
 import com.example.instagramapp.util.Resource
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
@@ -33,7 +31,7 @@ class CommentsBottomSheetFragment : BottomSheetDialogFragment() {
         fun newInstance(postId: String): CommentsBottomSheetFragment {
             val fragment = CommentsBottomSheetFragment()
             val args = Bundle()
-            args.putString("postId", postId)
+            args.putString(ConstValues.POST_ID, postId)
             fragment.arguments = args
             return fragment
         }
@@ -54,51 +52,24 @@ class CommentsBottomSheetFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         auth = FirebaseAuth.getInstance()
-        arguments?.getString("postId")?.let {
+        arguments?.getString(ConstValues.POST_ID)?.let {
             postId = it
         }
-        // sentComment()
-        btnPost()
+        buttonPost()
         viewModel.readComment(postId)
-
-        // setupRecyclerView()
-
         viewModel.commentResult.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    Log.e("TAG", "onViewCreated: ${resource.data}")
                     commentAdapter.submitList(resource.data)
                 }
-
                 is Resource.Error -> {
                     // Handle error
                 }
-
                 is Resource.Loading -> {
                     // Show loading indicator
                 }
             }
         }
-//        viewModel.userResult.observe(viewLifecycleOwner) { resource ->
-//            when (resource) {
-//                is Resource.Success -> {
-//                    val user = resource.data.firstOrNull()
-//                    user?.let {
-//                        Glide.with(requireContext())
-//                            .load(user.imageUrl)
-//                            .into(binding.profilImage)
-//                    }
-//                }
-//                is Resource.Error -> {
-//                    // Handle error
-//                }
-//                is Resource.Loading -> {
-//                    // Show loading indicator
-//                }
-//            }
-//        }
-
-
         viewModel.getCurrentUserProfileImage { imageUrl ->
             Glide.with(requireContext())
                 .load(imageUrl)
@@ -106,10 +77,8 @@ class CommentsBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-
-    fun btnPost() {
+    fun buttonPost() {
         binding.post.setOnClickListener {
-
             sentComment()
         }
     }
@@ -121,26 +90,22 @@ class CommentsBottomSheetFragment : BottomSheetDialogFragment() {
         val commentRef = firestore.collection("Comments").document(postId)
 
         val commentData = hashMapOf(
-            "comment" to comment,
-            "userId" to userId,
-            "time" to com.google.firebase.Timestamp.now(),
-            "commentId" to commentId
+            ConstValues.COMMENT to comment,
+            ConstValues.USER_ID to userId,
+            ConstValues.TIME to com.google.firebase.Timestamp.now(),
+            ConstValues.COMMENTID to commentId
         )
 
         commentRef.set(mapOf(commentId to commentData), SetOptions.merge())
-            .addOnSuccessListener {
-
-            }
-            .addOnFailureListener { e ->
-
-                Log.e("Comments", "Error adding comment", e)
-            }
+            .addOnSuccessListener {}
+            .addOnFailureListener {}
     }
 
     fun sentComment() {
         val comment = binding.addToComment
         if (comment.text.trim().toString() == "") {
-            Toast.makeText(requireContext(), "Please add the comment", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(),
+                getString(R.string.please_add_the_comment), Toast.LENGTH_SHORT).show()
             comment.text.clear()
         } else {
             addCommentToPost(postId, comment.text.toString(), auth.currentUser!!.uid)

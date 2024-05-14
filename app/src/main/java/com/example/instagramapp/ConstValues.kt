@@ -16,5 +16,12 @@ object ConstValues {
     const val POST_IMAGE_URL = "postImageUrl"
     const val COMMENT = "comment"
     const val COMMENTID = "commentId"
+    const val STORY_ID = "storyId"
+    const val TIME_START="timeStart"
+    const val TIME_END="timeEnd"
+    const val POSTS="Posts"
+    const val IMAGES="images"
+    const val USERS="Users"
+//data//model
 }
 

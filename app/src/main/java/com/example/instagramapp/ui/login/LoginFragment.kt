@@ -50,7 +50,8 @@ class LoginFragment : Fragment() {
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(requireContext(), "Incorrect username or password", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(),
+                    getString(R.string.incorrect_username_or_password), Toast.LENGTH_SHORT)
                     .show()
             }
         }

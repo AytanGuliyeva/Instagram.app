@@ -1,35 +1,23 @@
 package com.example.instagramapp.ui.profile
 
 import Post
-import ProfileViewModel
-import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
-import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentPostDetailBinding
-import com.example.instagramapp.ui.main.CommentsBottomSheetFragment
-import com.example.instagramapp.ui.profile.PostDetailViewModel
-import com.example.instagramapp.ui.search.UserDetailFragmentArgs
+import com.example.instagramapp.ui.main.comment.CommentsBottomSheetFragment
 import com.example.instagramapp.ui.search.model.Users
 import com.example.instagramapp.util.Resource
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 class PostDetailFragment : Fragment() {

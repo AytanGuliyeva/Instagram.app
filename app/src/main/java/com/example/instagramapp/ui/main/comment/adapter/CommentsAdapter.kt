@@ -1,4 +1,4 @@
-package com.example.instagramapp.ui.main.adapters
+package com.example.instagramapp.ui.main.comment.adapter
 
 import android.content.ContentValues
 import android.util.Log
@@ -10,11 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.instagramapp.ConstValues
 import com.example.instagramapp.databinding.CommentsItemBinding
-import com.example.instagramapp.databinding.FragmentCommentsBottomSheetBinding
-import com.example.instagramapp.databinding.SearchUserItemBinding
 import com.example.instagramapp.ui.main.model.Comments
 import com.example.instagramapp.ui.search.model.Users
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -22,7 +19,6 @@ import java.util.Locale
 
 class CommentsAdapter() : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder>() {
     private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
     private val diffUtilCallBack = object : DiffUtil.ItemCallback<Comments>() {
         override fun areItemsTheSame(oldItem: Comments, newItem: Comments): Boolean {
             return oldItem.userId == newItem.userId
@@ -58,7 +54,7 @@ class CommentsAdapter() : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder
         fun bind(comments: Comments) {
             binding.txtComment.text = comments.comment
             binding.txtTime.text = comments.time.toString()
-            val timestamp = comments.time?.toDate()
+            val timestamp = comments.time.toDate()
 
             timestamp?.let {
                 val currentTime = System.currentTimeMillis()
@@ -92,8 +88,8 @@ class CommentsAdapter() : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder
             // binding.txtUsername.text=comments.userId
         }
 
-        fun fetchUsername(userId: String) {
-            firestore.collection("Users")
+        private fun fetchUsername(userId: String) {
+            firestore.collection(ConstValues.USERS)
                 .document(userId)
                 .get()
                 .addOnSuccessListener { documentSnapshot ->

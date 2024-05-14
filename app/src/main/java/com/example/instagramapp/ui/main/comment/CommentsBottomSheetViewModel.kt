@@ -1,6 +1,5 @@
-package com.example.instagramapp.ui.main
+package com.example.instagramapp.ui.main.comment
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,12 +10,10 @@ import com.example.instagramapp.util.Resource
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.UUID
 
 class CommentsBottomSheetViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private lateinit var auth: FirebaseAuth
-
 
     private val _commentResult = MutableLiveData<Resource<List<Comments>>>()
     val commentResult: LiveData<Resource<List<Comments>>>
@@ -30,8 +27,6 @@ class CommentsBottomSheetViewModel : ViewModel() {
     fun readComment(postId: String) {
         firestore.collection("Comments").document(postId).addSnapshotListener { value, error ->
             if (error != null) {
-
-                Log.e("comment", "readComment_error")
                 return@addSnapshotListener
             }
             if (value != null && value.exists()) {
@@ -84,16 +79,10 @@ class CommentsBottomSheetViewModel : ViewModel() {
         currentUserUid?.let { uid ->
             firestore.collection("Users").document(uid).get()
                 .addOnSuccessListener { document ->
-                    val imageUrl = document.getString("imageUrl")
+                    val imageUrl = document.getString(ConstValues.IMAGE_URL)
                     imageUrl?.let { callback(it) }
                 }
-                .addOnFailureListener { exception ->
-                    Log.e(
-                        "CommentsBottomSheet",
-                        "Error getting current user's profile image",
-                        exception
-                    )
-                }
+                .addOnFailureListener {}
         }
     }
 }

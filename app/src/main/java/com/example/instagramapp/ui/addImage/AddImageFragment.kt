@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import com.example.instagramapp.ConstValues
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentAddImageBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -72,7 +73,8 @@ class AddImageFragment : Fragment() {
                 )
             binding.imgAddPost.setImageBitmap(selectedImageBitmap)
         } else {
-            Toast.makeText(requireContext(), "Something gone wrong", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.something_gone_wrong, Toast.LENGTH_SHORT)
+                .show()
             findNavController().navigate(R.id.action_addImageFragment_to_profileFragment)
         }
     }
@@ -86,19 +88,19 @@ class AddImageFragment : Fragment() {
 
             if (selectedImageBitmap != null) {
                 val time = com.google.firebase.Timestamp.now()
-                val ref = firestore.collection("Posts").document()
+                val ref = firestore.collection(ConstValues.POSTS).document()
                 val postId = ref.id
 
                 val postMap = hashMapOf<String, Any>(
-                    "caption" to caption,
-                    "userId" to user,
-                    "time" to time,
-                    "postId" to postId,
+                    ConstValues.CAPTION to caption,
+                    ConstValues.USER_ID to user,
+                    ConstValues.TIME to time,
+                    ConstValues.POST_ID to postId,
                 )
 
                 uploadImage(postId, postMap, ref)
             } else {
-                Toast.makeText(requireContext(), "Please select an image", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(), R.string.please_select_an_image, Toast.LENGTH_SHORT)
                     .show()
                 binding.progressBar.visibility = View.GONE
 
@@ -116,17 +118,17 @@ class AddImageFragment : Fragment() {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, boas)
             val imageData = boas.toByteArray()
 
-            val storageRef = storage.reference.child("images").child("$postId.jpg")
+            val storageRef = storage.reference.child(ConstValues.IMAGES).child("$postId.jpg")
             storageRef.putBytes(imageData)
                 .addOnSuccessListener { taskSnapshot ->
                     storageRef.downloadUrl.addOnSuccessListener { uri ->
                         val downloadUrl = uri.toString()
-                        postMap["postImageUrl"] = downloadUrl
-                        postMap["time"] = com.google.firebase.Timestamp.now()
+                        postMap[ConstValues.POST_IMAGE_URL] = downloadUrl
+                        postMap[ConstValues.TIME] = com.google.firebase.Timestamp.now()
                         addProductInfoToFireStore(postMap, ref)
                     }
                 }.addOnFailureListener {
-                    Toast.makeText(requireContext(), "Failed to upload image!", Toast.LENGTH_SHORT)
+                    Toast.makeText(requireContext(), R.string.failed_to_upload_image, Toast.LENGTH_SHORT)
                         .show()
                 }
         }
@@ -137,7 +139,7 @@ class AddImageFragment : Fragment() {
             .addOnSuccessListener {
                 findNavController().navigate(R.id.action_addImageFragment_to_profileFragment)
             }.addOnFailureListener {
-                Toast.makeText(requireContext(), "Failed!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.Failed, Toast.LENGTH_SHORT).show()
                 findNavController().navigate(R.id.action_addImageFragment_to_profileFragment)
             }
     }

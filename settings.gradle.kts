@@ -12,7 +12,8 @@ dependencyResolutionManagement {
         mavenCentral()
         maven {
             url = uri("https://jitpack.io")
-        }    }
+        }
+    }
 }
 
 rootProject.name = "Instagram.app"

@@ -102,4 +102,13 @@
     <string name="please_select_an_image">Please select an image</string>
     <string name="failed_to_upload_image">Failed to upload image!</string>
     <string name="Failed">Failed</string>
+    <string name="add_story">Add story</string>
+    <string name="incorrect_username_or_password">Incorrect username or password</string>
+    <string name="please_wait_adding_the_post">Please wait adding the post</string>
+    <string name="story_successfully_shared">Story successfully shared</string>
+    <string name="please_select_photo">Please select photo</string>
+    <string name="permission_needed_for_gallery">Permission needed for gallery</string>
+    <string name="give_permission">Give permission</string>
+    <string name="permission_needed">Permission needed</string>
+    <string name="please_add_the_comment">Please add the comment</string>
 </resources>

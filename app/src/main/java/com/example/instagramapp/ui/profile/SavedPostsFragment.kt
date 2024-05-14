@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentSavedPostsBinding
-import com.example.instagramapp.ui.main.CommentsBottomSheetFragment
+import com.example.instagramapp.ui.main.comment.CommentsBottomSheetFragment
 import com.example.instagramapp.ui.search.adapter.PostSearchAdapter
 import com.example.instagramapp.util.Resource
 
