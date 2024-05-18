@@ -7,6 +7,4 @@ data class Post(
     val time: Timestamp? = null,
     val postImageUrl: String = "",
     var isLiked:Boolean=false
-) {
-//    constructor() : this("", "", "", null, "")
-}
+)

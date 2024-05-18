@@ -1,4 +1,4 @@
-package com.example.instagramapp
+package com.example.instagramapp.ui
 
 import android.os.Bundle
 import android.os.Handler
@@ -9,7 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.instagramapp.R
+import com.example.instagramapp.StartActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SplashScreenFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
