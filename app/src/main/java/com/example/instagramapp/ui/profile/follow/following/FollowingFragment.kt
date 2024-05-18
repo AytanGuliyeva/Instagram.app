@@ -1,4 +1,4 @@
-package com.example.instagramapp.ui.profile
+package com.example.instagramapp.ui.profile.follow.following
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,25 +6,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentFollowingBinding
-import com.example.instagramapp.ui.search.SearchFragmentDirections
-import com.example.instagramapp.ui.search.adapter.UserAdapter
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.ui.search.userDetail.adapter.UserAdapter
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.ConstValues
+import com.example.instagramapp.base.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FollowingFragment : Fragment() {
     private lateinit var binding: FragmentFollowingBinding
-    private lateinit var userId: String
 
     private lateinit var userAdapter: UserAdapter
-    private val viewModel: FollowingViewModel by viewModels()
+    val viewModel: FollowingViewModel by viewModels()
     private var selectedUser: Users? = null
-    //  val args: FollowingFragmentArgs by navArgs()
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,7 +30,7 @@ class FollowingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val userId = arguments?.getString("userId") ?: ""
+        val userId = arguments?.getString(ConstValues.USER_ID) ?: ""
         setupRecyclerView()
         viewModel.fetchFollowing(userId)
         observeFollowings()
@@ -64,17 +59,8 @@ class FollowingFragment : Fragment() {
         userAdapter = UserAdapter(
             itemClick = {
                 selectedUser = it
-                //1 userDetail(it.userId)
             }
         )
         binding.rvFollowing.adapter = userAdapter
     }
-
-//    fun userDetail(userId: String) {
-//        if (selectedUser != null) {
-//            val action = FollowingFragmentDirections.actionFollowingFragmentToUserDetailFragment(userId)
-//            findNavController().navigate(action)
-//        }
-//    }
-
 }

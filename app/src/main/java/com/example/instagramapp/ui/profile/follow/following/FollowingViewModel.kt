@@ -1,17 +1,19 @@
-package com.example.instagramapp.ui.profile
+package com.example.instagramapp.ui.profile.follow.following
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.instagramapp.ConstValues
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.base.util.ConstValues
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class FollowingViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
+@HiltViewModel
+class FollowingViewModel @Inject constructor(val firestore: FirebaseFirestore) : ViewModel() {
 
     private val _followingList = MutableLiveData<Resource<List<Users>>>()
     val followingResult: LiveData<Resource<List<Users>>>
@@ -23,14 +25,14 @@ class FollowingViewModel : ViewModel() {
 
     fun fetchFollowing(userId: String) {
         _loading.value = true
-        firestore.collection("Follow").document(userId)
+        firestore.collection(ConstValues.FOLLOW).document(userId)
             .get()
             .addOnSuccessListener { documentSnapshot ->
                 try {
 
                     val follow = documentSnapshot.data
                     if (follow != null) {
-                        val followingMap = follow["following"] as? HashMap<String, Boolean>
+                        val followingMap = follow[ConstValues.FOLLOWING] as? HashMap<String, Boolean>
                         val followingIds = followingMap?.keys?.toList() ?: emptyList()
 
                         fetchUserDetails(followingIds)
@@ -51,8 +53,8 @@ class FollowingViewModel : ViewModel() {
 
     private fun fetchUserDetails(userIds: List<String>) {
         val userDetails = mutableListOf<Users>()
-        firestore.collection("Users")
-            .whereIn("userId", userIds)
+        firestore.collection(ConstValues.USERS)
+            .whereIn(ConstValues.USER_ID, userIds)
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {

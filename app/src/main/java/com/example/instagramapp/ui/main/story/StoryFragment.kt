@@ -11,32 +11,41 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.example.instagramapp.base.util.ConstValues
+import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentStoryBinding
-import com.example.instagramapp.ui.main.model.Story
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.data.model.Story
+import com.example.instagramapp.base.util.Resource
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.AndroidEntryPoint
 import jp.shts.android.storiesprogressview.StoriesProgressView
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
     private lateinit var binding: FragmentStoryBinding
-    val args: StoryFragmentArgs by navArgs()
-    private val viewModel: StoryViewModel by viewModels()
+    private val args: StoryFragmentArgs by navArgs()
+    val viewModel: StoryViewModel by viewModels()
     private lateinit var storiesProgressView: StoriesProgressView
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
     private var prestime: Long = 0L
     private var limit: Long = 500
     private var counter = 0
-    val storyList = ArrayList<Story>()
+    private val storyList = ArrayList<Story>()
+
+    @Inject
+    lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var firestore: FirebaseFirestore
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentStoryBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -45,7 +54,6 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         storiesProgressView = binding.stories
-
         binding.storyDelete.visibility = View.GONE
 
         if (args.userId == auth.currentUser!!.uid) {
@@ -58,16 +66,11 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
                     storyList.clear()
                     storyList.addAll(storyResource.data)
                     story()
-                    Log.e("TAG", "onViewCreated: ${storyResource.data}", )
+                    Log.e("TAG", "onViewCreated: ${storyResource.data}")
                 }
 
-                is Resource.Error -> {
-                    //  binding.progressBar.visibility = View.GONE
-                }
-
-                is Resource.Loading -> {
-                    // binding.progressBar.visibility = View.VISIBLE
-                }
+                is Resource.Error -> {}
+                is Resource.Loading -> {}
             }
         }
         viewModel.fetchUserInformation(args.userId)
@@ -79,22 +82,12 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
                     val imageurl = userInfo.imageUrl
                     Glide.with(binding.root).load(imageurl).into(binding.storyPhoto)
                     binding.storyUsername.text = username
-                    Log.e("TAG", "onViewCreated: $username", )
+                    Log.e("TAG", "onViewCreated: $username")
                 }
-
-                //   binding.progressBar.visibility = View.GONE
-
-
-                is Resource.Error -> {
-                    //  binding.progressBar.visibility = View.GONE
-                }
-
-                is Resource.Loading -> {
-                    // binding.progressBar.visibility = View.VISIBLE
-                }
+                is Resource.Error -> {}
+                is Resource.Loading -> {}
             }
         }
-        //viewModel.getUserInfo(args.userId)
         binding.skip.setOnClickListener {
             binding.stories.skip()
         }
@@ -102,9 +95,9 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
             binding.stories.reverse()
         }
         binding.storyDelete.setOnClickListener {
-            Snackbar.make(it, "Delete this story?", Snackbar.LENGTH_INDEFINITE)
-                .setAction("Yes") {
-                    firestore.collection("Story").document(args.userId)
+            Snackbar.make(it, getString(R.string.delete_this_story), Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.yes) {
+                    firestore.collection(ConstValues.STORY).document(args.userId)
                         .update(storyList[counter].storyId, FieldValue.delete())
                     findNavController().popBackStack()
                 }.show()
@@ -121,17 +114,14 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
                     storiesProgressView.pause()
                     return false
                 }
-
                 MotionEvent.ACTION_UP -> {
                     val now = System.currentTimeMillis()
                     storiesProgressView.resume()
                     return limit < now - prestime
                 }
-
             }
             return false
         }
-
     }
 
     override fun onNext() {
@@ -171,10 +161,7 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
 
     override fun onResume() {
         super.onResume()
-        storiesProgressView?.resume()
+        storiesProgressView.resume()
     }
-//    override fun onRestart() {
-//        storiesProgressView.resume()
-//        super.onRestart()
-//    }
+
 }

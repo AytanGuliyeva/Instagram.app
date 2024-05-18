@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.profile.PostDetailFragment">
+    tools:context=".ui.profile.postDetail.PostDetailFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -37,6 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:textStyle="bold"
+            tools:text="Username"
             app:layout_constraintBottom_toBottomOf="@id/imgProfile"
             app:layout_constraintStart_toEndOf="@id/imgProfile"
             app:layout_constraintTop_toTopOf="@id/imgProfile" />
@@ -58,6 +59,7 @@
             android:id="@+id/imgPost"
             android:layout_width="match_parent"
             android:layout_height="480dp"
+            android:layout_marginTop="10dp"
             android:contentDescription="@string/post"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -129,7 +131,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:layout_marginStart="5dp"
-            android:text="@string/username"
+            tools:text="@string/username"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txtLikes" />

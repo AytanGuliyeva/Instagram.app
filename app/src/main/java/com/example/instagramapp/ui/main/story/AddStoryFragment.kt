@@ -17,7 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
-import com.example.instagramapp.ConstValues
+import com.example.instagramapp.base.util.ConstValues
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentAddStoryBinding
 import com.google.android.material.snackbar.Snackbar
@@ -29,17 +29,25 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class AddStoryFragment : Fragment() {
     private lateinit var binding: FragmentAddStoryBinding
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var permissionResultLauncher: ActivityResultLauncher<String>
-    private lateinit var auth: FirebaseAuth
-    private lateinit var firestore: FirebaseFirestore
-    private lateinit var storage: FirebaseStorage
-    var selectPicture: Uri? = null
+
+    @Inject
+    lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var firestore: FirebaseFirestore
+
+    @Inject
+    lateinit var storage: FirebaseStorage
+    private var selectPicture: Uri? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -65,7 +73,7 @@ class AddStoryFragment : Fragment() {
         }
     }
 
-    fun upload() {
+    private fun upload() {
         val progress = ProgressDialog(requireActivity())
         progress.setMessage(getString(R.string.please_wait_adding_the_post))
         progress.show()
@@ -78,13 +86,14 @@ class AddStoryFragment : Fragment() {
 
         if (selectPicture != null) {
             imageReference.putFile(selectPicture!!).addOnSuccessListener {
-                val uploadPictureReference = storage.reference.child("story").child(imageName)
+                val uploadPictureReference =
+                    storage.reference.child(ConstValues.STORY_STORAGE).child(imageName)
                 uploadPictureReference.downloadUrl.addOnSuccessListener { imgUrl ->
                     val downloadUrl = imgUrl.toString()
 
                     val ramdonkey = UUID.randomUUID().toString()
                     val myId = Firebase.auth.currentUser!!.uid
-                    val ref = firestore.collection("Story").document(myId)
+                    val ref = firestore.collection(ConstValues.STORY).document(myId)
                     val hmapkey = hashMapOf<String, Any>()
                     val hmap = hashMapOf<String, Any>()
                     val timeEnd = System.currentTimeMillis() + 86400000
@@ -118,12 +127,14 @@ class AddStoryFragment : Fragment() {
             }
         } else {
             progress.dismiss()
-            Toast.makeText(requireActivity(),
-                getString(R.string.please_select_photo), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireActivity(),
+                getString(R.string.please_select_photo), Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
-    fun selectImage(view: View) {
+    private fun selectImage(view: View) {
         if (ContextCompat.checkSelfPermission(
                 requireActivity(),
                 android.Manifest.permission.READ_EXTERNAL_STORAGE
@@ -134,8 +145,10 @@ class AddStoryFragment : Fragment() {
                     android.Manifest.permission.READ_EXTERNAL_STORAGE
                 )
             ) {
-                Snackbar.make(view,
-                    getString(R.string.permission_needed_for_gallery), Snackbar.LENGTH_INDEFINITE)
+                Snackbar.make(
+                    view,
+                    getString(R.string.permission_needed_for_gallery), Snackbar.LENGTH_INDEFINITE
+                )
                     .setAction(getString(R.string.give_permission)) {
                         permissionResultLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
                     }.show()
@@ -149,9 +162,7 @@ class AddStoryFragment : Fragment() {
         }
     }
 
-
     private fun registerLauncher() {
-
         activityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == AppCompatActivity.RESULT_OK) {
@@ -169,9 +180,9 @@ class AddStoryFragment : Fragment() {
 
         permissionResultLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-                    val intentToGallery =
-                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                    activityResultLauncher.launch(intentToGallery)
+                val intentToGallery =
+                    Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                activityResultLauncher.launch(intentToGallery)
             }
     }
 }

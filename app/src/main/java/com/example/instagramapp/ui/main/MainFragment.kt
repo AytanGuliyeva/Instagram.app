@@ -1,7 +1,8 @@
 package com.example.instagramapp.ui.main
 
-import Post
+import com.example.instagramapp.data.model.Post
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,48 +13,53 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.example.instagramapp.ConstValues
+import com.example.instagramapp.base.util.ConstValues
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentMainBinding
 import com.example.instagramapp.ui.main.comment.CommentsBottomSheetFragment
 import com.example.instagramapp.ui.main.story.adapter.StoryAdapter
 import com.example.instagramapp.ui.search.adapter.PostSearchAdapter
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.base.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class MainFragment : Fragment() {
     private lateinit var binding: FragmentMainBinding
-    private val viewModel: MainViewModel by viewModels()
+    private var token:String?=null
+    val viewModel: MainViewModel by viewModels()
     private lateinit var postAdapter: PostSearchAdapter
     private lateinit var storyAdapter: StoryAdapter
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
-//    private var selectedStory: Story? = null
 
+    @Inject
+    lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var firestore: FirebaseFirestore
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        readPreference()
         setupRecyclerView()
         observePostData()
         viewModel.readStory()
-
-        // viewModel.fetchPosts()
+        firestore.collection(ConstValues.USERS).document(auth.currentUser!!.uid).update("token",token)
+        initNavigationListener()
     }
 
     private fun observePostData() {
-        viewModel.postResult.observe(viewLifecycleOwner, Observer { resource ->
+        viewModel.postResult.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
@@ -83,15 +89,18 @@ class MainFragment : Fragment() {
 
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
-                    Toast.makeText(requireContext(), "Error occurred!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_occurred), Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
-        })
+        }
 //        viewModel.likeCount.observe(viewLifecycleOwner){
 //            postAdapter.updateLikeCount(it)
 //        }
 
-        viewModel.storyResult.observe(viewLifecycleOwner, Observer { resource ->
+        viewModel.storyResult.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     // Show loading indicator if needed
@@ -99,14 +108,11 @@ class MainFragment : Fragment() {
 
                 is Resource.Success -> {
                     val storyList = resource.data
-                    Log.e("TAG", "observePostData: $storyList")
                     storyAdapter = StoryAdapter(storyList,
                         storyClick = {
-                            //  selectedStory = it
                             selectedStory(it)
                         },
                         addStoryClick = {
-                            //  selectedStory = it
                             selectedAddStory()
                         }
                     )
@@ -117,15 +123,12 @@ class MainFragment : Fragment() {
                     // Handle error case if needed
                 }
             }
-        })
-
+        }
     }
 
-
-    fun selectedAddStory() {
-        firestore.collection("Story").document(auth.currentUser!!.uid)
+    private fun selectedAddStory() {
+        firestore.collection(ConstValues.STORY).document(auth.currentUser!!.uid)
             .get().addOnSuccessListener { value ->
-
                 var count = 0
                 if (value != null) {
                     try {
@@ -143,24 +146,21 @@ class MainFragment : Fragment() {
                             }
                         }
                     } catch (_: NullPointerException) {
-
                     }
                     if (count > 0) {
                         val alert = AlertDialog.Builder(requireContext())
-                        alert.setNegativeButton("view story") { d, _ ->
+                        alert.setTitle(getString(R.string.view_story_or_add_story))
+                        alert.setMessage(getString(R.string.do_you_want_to_view_the_story_or_add_a_new_one))
+                        alert.setNegativeButton(getString(R.string.view_story)) { d, _ ->
                             val action =
                                 MainFragmentDirections.actionMainFragmentToStoryFragment(auth.currentUser!!.uid)
                             findNavController().navigate(action)
-
                             d.dismiss()
-
                         }
-                        alert.setPositiveButton("add story") { d, _ ->
-
+                        alert.setPositiveButton(getString(R.string.add_story)) { d, _ ->
                             val action =
                                 MainFragmentDirections.actionMainFragmentToAddStoryFragment()
                             findNavController().navigate(action)
-
                             d.dismiss()
                         }
                         alert.setCancelable(true)
@@ -171,67 +171,22 @@ class MainFragment : Fragment() {
                             MainFragmentDirections.actionMainFragmentToAddStoryFragment()
                         findNavController().navigate(action)
                     }
-
-
                 }
-
-
-            }.addOnFailureListener {
-            }
-
-//        val action = MainFragmentDirections.actionMainFragmentToAddStoryFragment()
-//        findNavController().navigate(action)
-
+            }.addOnFailureListener {}
     }
 
-    fun selectedStory(userId: String) {
-
+    private fun selectedStory(userId: String) {
         val action = MainFragmentDirections.actionMainFragmentToStoryFragment(userId)
         findNavController().navigate(action)
     }
 
-
-//    fun click() {
-//
-//
-//        if (selectedStory!=null) {
-//
-//
-//            if (count > 0) {
-//                val alert = AlertDialog.Builder(mContext)
-//                alert.setNegativeButton("view story") { d, _ ->
-//
-//                    val intent = Intent(mContext, StoryActivity::class.java)
-//                    intent.putExtra("userId", Firebase.auth.currentUser!!.uid)
-//                    mContext.startActivity(intent)
-//                    d.dismiss()
-//
-//                }
-//                alert.setPositiveButton("add story") { d, _ ->
-//
-//                    storyClickListener.storyclickListener()
-//
-//                    d.dismiss()
-//                }
-//                alert.setCancelable(true)
-//                alert.create().show()
-//
-//            } else {
-//                storyClickListener.storyclickListener()
-//            }
-//
-//
-//        } else {
-//            Log.e("storytime count++", count.toString())
-//            if (count > 0) {
-//                textView.setText(R.string.my_Story)
-//            } else {
-//                textView.setText(R.string.add_Story)
-//            }
-//        }
-//    }
-
-
+    private fun readPreference() {
+        activity?.let {
+            val sharedPreferences = it.getSharedPreferences("userPreference", Context.MODE_PRIVATE)
+            token = sharedPreferences.getString("token", "")
+            Log.e("TAG", "readPreference: $token", )
+        }
+    }
     private fun setupRecyclerView() {
         postAdapter = PostSearchAdapter(itemClick = {
             // selectedPost = it;postDetail(selectedPost!!.postId, selectedPost!!.userId)
@@ -242,34 +197,31 @@ class MainFragment : Fragment() {
             },
             likeButtonClick = { postId, imageView ->
                 val tag = imageView.tag?.toString() ?: ""
-                if (tag == "liked") {
+                if (tag == getString(R.string.liked)) {
                     viewModel.toggleLikeStatus(postId, tag)
                     imageView.setImageResource(R.drawable.like_icon)
-                    imageView.tag = "like"
+                    imageView.tag = getString(R.string.unlike)
                 } else {
                     viewModel.toggleLikeStatus(postId, tag)
                     imageView.setImageResource(R.drawable.icon_liked)
-                    imageView.tag = "liked"
+                    imageView.tag = getString(R.string.liked)
                 }
                 //toggleLikeStatus(postId, imageView)
 
             }, saveButtonClick = { postId, imageView ->
                 val tag = imageView.tag?.toString() ?: ""
-                if (tag == "saved") {
+                if (tag == getString(R.string.saved)) {
                     viewModel.toggleSaveStatus(postId, tag)
                     imageView.setImageResource(R.drawable.save_icon)
-                    imageView.tag = "save"
+                    imageView.tag = getString(R.string.save)
                 } else {
                     viewModel.toggleSaveStatus(postId, tag)
                     imageView.setImageResource(R.drawable.icons8_saved_icon)
-                    imageView.tag = "saved"
+                    imageView.tag = getString(R.string.saved)
                 }
             })
 
         binding.rvPost.adapter = postAdapter
-
-//       storyAdapter=StoryAdapter()
-
     }
 
     //like
@@ -288,43 +240,45 @@ class MainFragment : Fragment() {
 //    }
 
     private fun likeCount(likes: TextView, postId: String) {
-        firestore.collection("Likes").document(postId).addSnapshotListener { value, error ->
-            if (error != null) {
-                Log.e("likeCount", "Error fetching like count: $error")
-                return@addSnapshotListener
-            }
-            if (value != null && value.exists()) {
-                val likesCount = value.data?.size ?: 0
-                val likesString = if (likesCount == 0) {
-                    "0 likes"
-                } else if (likesCount == 1) {
-                    "1 like"
-                } else {
-                    "$likesCount likes"
+        firestore.collection(ConstValues.LIKES).document(postId)
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    Log.e("likeCount", "Error fetching like count: $error")
+                    return@addSnapshotListener
                 }
-                likes.text = likesString
-            } else {
-                likes.text = "0 likes"
+                if (value != null && value.exists()) {
+                    val likesCount = value.data?.size ?: 0
+                    val likesString = if (likesCount == 0) {
+                        getString(R.string._0_likes)
+                    } else if (likesCount == 1) {
+                        getString(R.string._1_like)
+                    } else {
+                        "$likesCount likes"
+                    }
+                    likes.text = likesString
+                } else {
+                    likes.text = getString(R.string._0_likes)
+
+                }
             }
-        }
     }
 
     private fun checkLikeStatus(postId: String, imageView: ImageView) {
-        firestore.collection("Likes").document(postId).get()
+        firestore.collection(ConstValues.LIKES).document(postId).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
                     val likedByCurrentUser =
                         document.getBoolean(auth.currentUser!!.uid) ?: false
                     if (likedByCurrentUser) {
                         imageView.setImageResource(R.drawable.icon_liked)
-                        imageView.tag = "liked"
+                        imageView.tag = getString(R.string.liked)
                     } else {
                         imageView.setImageResource(R.drawable.like_icon)
-                        imageView.tag = "like"
+                        imageView.tag = getString(R.string.unlike)
                     }
                 } else {
                     imageView.setImageResource(R.drawable.like_icon)
-                    imageView.tag = "like"
+                    imageView.tag = getString(R.string.unlike)
                 }
             }
             .addOnFailureListener { exception ->
@@ -332,27 +286,10 @@ class MainFragment : Fragment() {
             }
     }
 
-//    private fun addLikeToFirestore(postId: String) {
-//        val likeData = hashMapOf(
-//            auth.currentUser!!.uid to true
-//        )
-//        firestore.collection("Likes").document(postId).set(likeData, SetOptions.merge())
-//            .addOnSuccessListener {
-//                Log.d("addLikeToFirestore", "Like added successfully")
-//            }
-//            .addOnFailureListener { exception ->
-//                Log.e("addLikeToFirestore", "Error adding like: $exception")
-//            }
-//    }
-//
-//    private fun removeLikeFromFirestore(postId: String) {
-//        firestore.collection("Likes").document(postId)
-//            .update(auth.currentUser!!.uid, FieldValue.delete())
-//            .addOnSuccessListener {
-//                Log.d("removeLikeFromFirestore", "Like removed successfully")
-//            }
-//            .addOnFailureListener { exception ->
-//                Log.e("removeLikeFromFirestore", "Error removing like: $exception")
-//            }
-//    }
+    private fun initNavigationListener() {
+        binding.btnDm.setOnClickListener {
+            val action = MainFragmentDirections.actionMainFragmentToDmFragment()
+            findNavController().navigate(action)
+        }
+    }
 }

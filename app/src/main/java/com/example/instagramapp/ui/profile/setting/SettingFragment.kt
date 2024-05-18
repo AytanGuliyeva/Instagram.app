@@ -1,4 +1,4 @@
-package com.example.instagramapp.ui.profile
+package com.example.instagramapp.ui.profile.setting
 
 import android.app.Dialog
 import android.graphics.Color
@@ -8,20 +8,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.Button
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.BottomSheetSettingsBinding
+import com.example.instagramapp.base.util.ConstValues
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingFragment : BottomSheetDialogFragment(R.layout.bottom_sheet_settings) {
 
     lateinit var binding: BottomSheetSettingsBinding
-    private lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var firestore: FirebaseFirestore
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,11 +46,11 @@ class SettingFragment : BottomSheetDialogFragment(R.layout.bottom_sheet_settings
         super.onViewCreated(view, savedInstanceState)
         auth = Firebase.auth
 
-        btnSaved()
-        btnLogout()
+        initNavigationListener()
+        buttonLogout()
     }
 
-    private fun btnLogout() {
+    private fun buttonLogout() {
         binding.txtLogOut.setOnClickListener {
             val dialog = Dialog(requireContext())
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -52,6 +62,8 @@ class SettingFragment : BottomSheetDialogFragment(R.layout.bottom_sheet_settings
             val btnCancel: TextView = dialog.findViewById(R.id.btnCancel)
 
             btnLogout.setOnClickListener {
+                firestore.collection(ConstValues.USERS).document(auth.currentUser!!.uid)
+                    .update(ConstValues.TOKEN, "")
                 auth.signOut()
                 findNavController().navigate(R.id.action_settingFragment_to_loginFragment)
                 dialog.dismiss()
@@ -59,12 +71,11 @@ class SettingFragment : BottomSheetDialogFragment(R.layout.bottom_sheet_settings
             btnCancel.setOnClickListener {
                 dialog.dismiss()
             }
-
             dialog.show()
         }
     }
 
-    private fun btnSaved() {
+    private fun initNavigationListener() {
         binding.txtSaved.setOnClickListener {
             val action = SettingFragmentDirections.actionSettingFragmentToSavedPostsFragment()
             findNavController().navigate(action)

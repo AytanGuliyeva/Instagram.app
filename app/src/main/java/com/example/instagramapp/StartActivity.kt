@@ -10,6 +10,7 @@ import androidx.navigation.ui.NavigationUI
 import com.example.instagramapp.databinding.ActivityStartBinding
 import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class StartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityStartBinding
     private lateinit var navController: NavController

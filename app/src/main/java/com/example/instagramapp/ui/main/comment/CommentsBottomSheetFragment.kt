@@ -7,25 +7,31 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
-import com.example.instagramapp.ConstValues
+import com.example.instagramapp.base.util.ConstValues
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentCommentsBottomSheetBinding
 import com.example.instagramapp.ui.main.comment.adapter.CommentsAdapter
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.base.util.Resource
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class CommentsBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentCommentsBottomSheetBinding
-    private val viewModel: CommentsBottomSheetViewModel by viewModels()
-    private val firestore = FirebaseFirestore.getInstance()
-    private lateinit var auth: FirebaseAuth
+    val viewModel: CommentsBottomSheetViewModel by viewModels()
     private lateinit var commentAdapter: CommentsAdapter
 
+
+    @Inject
+    lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var firestore: FirebaseFirestore
 
     companion object {
         fun newInstance(postId: String): CommentsBottomSheetFragment {
@@ -62,9 +68,11 @@ class CommentsBottomSheetFragment : BottomSheetDialogFragment() {
                 is Resource.Success -> {
                     commentAdapter.submitList(resource.data)
                 }
+
                 is Resource.Error -> {
                     // Handle error
                 }
+
                 is Resource.Loading -> {
                     // Show loading indicator
                 }
@@ -87,7 +95,7 @@ class CommentsBottomSheetFragment : BottomSheetDialogFragment() {
     fun addCommentToPost(postId: String, comment: String, userId: String) {
         val commentId = UUID.randomUUID().toString()
 
-        val commentRef = firestore.collection("Comments").document(postId)
+        val commentRef = firestore.collection(ConstValues.COMMENTS).document(postId)
 
         val commentData = hashMapOf(
             ConstValues.COMMENT to comment,
@@ -104,8 +112,10 @@ class CommentsBottomSheetFragment : BottomSheetDialogFragment() {
     fun sentComment() {
         val comment = binding.addToComment
         if (comment.text.trim().toString() == "") {
-            Toast.makeText(requireContext(),
-                getString(R.string.please_add_the_comment), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.please_add_the_comment), Toast.LENGTH_SHORT
+            ).show()
             comment.text.clear()
         } else {
             addCommentToPost(postId, comment.text.toString(), auth.currentUser!!.uid)

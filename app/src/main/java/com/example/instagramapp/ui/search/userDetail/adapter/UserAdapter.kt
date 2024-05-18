@@ -1,4 +1,4 @@
-package com.example.instagramapp.ui.search.adapter
+package com.example.instagramapp.ui.search.userDetail.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,10 +6,8 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.instagramapp.databinding.PostItemBinding
-import com.example.instagramapp.databinding.ProfilePostItemBinding
 import com.example.instagramapp.databinding.SearchUserItemBinding
-import com.example.instagramapp.ui.search.model.Users
+import com.example.instagramapp.data.model.Users
 
 class UserAdapter(
     private var itemClick: (item: Users) -> Unit

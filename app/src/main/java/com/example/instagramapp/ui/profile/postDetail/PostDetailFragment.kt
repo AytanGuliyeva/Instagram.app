@@ -1,8 +1,7 @@
-package com.example.instagramapp.ui.profile
+package com.example.instagramapp.ui.profile.postDetail
 
-import Post
+import com.example.instagramapp.data.model.Post
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,21 +10,20 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentPostDetailBinding
 import com.example.instagramapp.ui.main.comment.CommentsBottomSheetFragment
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+@AndroidEntryPoint
 class PostDetailFragment : Fragment() {
     private lateinit var binding: FragmentPostDetailBinding
-    private val viewModel: PostDetailViewModel by viewModels()
+    val viewModel: PostDetailViewModel by viewModels()
     val args: PostDetailFragmentArgs by navArgs()
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,8 +35,7 @@ class PostDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        btnBack()
-
+        initListener()
 
         viewModel.userInformation.observe(viewLifecycleOwner) { userResource ->
             when (userResource) {
@@ -63,16 +60,12 @@ class PostDetailFragment : Fragment() {
                     updatePostUI(postResource.data)
                     binding.btnShare.setOnClickListener {
                         //        shareWithWp(postResource.data)
-
                     }
                     binding.progressBar.visibility = View.GONE
-
                 }
-
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
                 }
-
                 is Resource.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                 }
@@ -83,21 +76,16 @@ class PostDetailFragment : Fragment() {
                 is Resource.Success -> {
                     val commentText = "View all ${commentResource.data} comments"
                     binding.txtComment.text = commentText
-
                 }
-
                 is Resource.Error -> {
                 }
-
                 is Resource.Loading -> {
                 }
             }
         }
         viewModel.fetchUserInformation(args.userId)
-        Log.e("TAG", "onViewCreated: ${args.postId}")
         viewModel.fetchPosts(args.postId)
         viewModel.fetchCommentCount(args.postId)
-
 
     }
 
@@ -129,20 +117,20 @@ class PostDetailFragment : Fragment() {
             val minutesAgo = (timeDifference / (1000 * 60)).toInt()
 
             if (minutesAgo < 1) {
-                binding.txtTime.text = "Just now"
+                binding.txtTime.text = getString(R.string.just_now)
             } else if (minutesAgo < 60) {
-                val timeAgoText = if (minutesAgo == 1) "1 minute ago" else "$minutesAgo minutes ago"
+                val timeAgoText = if (minutesAgo == 1) getString(R.string._1_minute_ago) else "$minutesAgo minutes ago"
                 binding.txtTime.text = timeAgoText
             } else if (minutesAgo < 1440) {
                 val hoursAgo = minutesAgo / 60
-                val timeAgoText = if (hoursAgo == 1) "1 hour ago" else "$hoursAgo hours ago"
+                val timeAgoText = if (hoursAgo == 1) getString(R.string._1_hour_ago) else "$hoursAgo hours ago"
                 binding.txtTime.text = timeAgoText
             } else if (minutesAgo < 10080) {
                 val daysAgo = minutesAgo / 1440
-                val timeAgoText = if (daysAgo == 1) "1 day ago" else "$daysAgo days ago"
+                val timeAgoText = if (daysAgo == 1) getString(R.string._1_day_ago) else "$daysAgo days ago"
                 binding.txtTime.text = timeAgoText
             } else {
-                val dateFormat = SimpleDateFormat("dd MMMM", Locale.getDefault())
+                val dateFormat = SimpleDateFormat(getString(R.string.dd_mmmm), Locale.getDefault())
                 val formattedDate = dateFormat.format(it)
                 binding.txtTime.text = formattedDate
             }
@@ -164,10 +152,8 @@ class PostDetailFragment : Fragment() {
 
     }
 
-
-    private fun btnBack() {
+    private fun initListener() {
         binding.btnBack.setOnClickListener {
-            val action = PostDetailFragmentDirections.actionPostDetailFragmentToProfileFragment()
             findNavController().popBackStack()
         }
     }

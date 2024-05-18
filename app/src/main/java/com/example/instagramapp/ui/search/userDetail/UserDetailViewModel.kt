@@ -1,30 +1,29 @@
-package com.example.instagramapp.ui.search
+package com.example.instagramapp.ui.search.userDetail
 
-import Post
+import com.example.instagramapp.data.model.Post
 import android.content.ContentValues.TAG
 import android.util.Log
-import android.widget.Button
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.instagramapp.ConstValues
-import com.example.instagramapp.R
+import com.example.instagramapp.base.util.ConstValues
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
-import com.google.firebase.Timestamp
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class UserDetailViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = Firebase.auth.currentUser!!.uid
+@HiltViewModel
+class UserDetailViewModel @Inject constructor(
+    val firestore: FirebaseFirestore,
+    val auth: FirebaseAuth
+) : ViewModel() {
 
     private val _userInformation = MutableLiveData<Resource<Users>>()
     val userInformation: LiveData<Resource<Users>>
@@ -60,7 +59,7 @@ class UserDetailViewModel : ViewModel() {
 
     fun fetchPosts(userId: String) {
         _loading.postValue(true)
-        firestore.collection("Posts").get()
+        firestore.collection(ConstValues.POSTS).get()
             .addOnSuccessListener { querySnapshot ->
                 val postList = mutableListOf<Post>()
                 for (document in querySnapshot.documents) {
@@ -83,7 +82,7 @@ class UserDetailViewModel : ViewModel() {
     }
 
     fun fetchFollowersCount(userId: String) {
-        firestore.collection("Follow").document(userId)
+        firestore.collection(ConstValues.FOLLOW).document(userId)
             .addSnapshotListener { documentSnapshot, error ->
                 if (error != null) {
                     error.localizedMessage?.let {
@@ -93,7 +92,7 @@ class UserDetailViewModel : ViewModel() {
                 if (documentSnapshot != null && documentSnapshot.exists()) {
                     val follow = documentSnapshot.data
                     if (follow != null) {
-                        val followers = (follow["followers"] as? HashMap<*, *>)?.size ?: 0
+                        val followers = (follow[ConstValues.FOLLOWERS] as? HashMap<*, *>)?.size ?: 0
                         _followersCount.postValue(followers)
                     } else {
                         _followersCount.postValue(0)
@@ -104,7 +103,7 @@ class UserDetailViewModel : ViewModel() {
     }
 
     fun fetchFollowingCount(userId: String) {
-        firestore.collection("Follow").document(userId)
+        firestore.collection(ConstValues.FOLLOW).document(userId)
             .addSnapshotListener { documentSnapshot, error ->
                 if (error != null) {
                     error.localizedMessage?.let {
@@ -126,11 +125,12 @@ class UserDetailViewModel : ViewModel() {
 
     fun followClickListener(userId: String) {
         if (_isFollowing.value == true) {
-            firestore.collection("Follow").document(auth).update(
-                "following.$userId",
-                FieldValue.delete()
-            ).addOnSuccessListener {
-                firestore.collection("Follow").document(userId).update(
+            firestore.collection(ConstValues.FOLLOW).document(Firebase.auth.currentUser!!.uid)
+                .update(
+                    "following.$userId",
+                    FieldValue.delete()
+                ).addOnSuccessListener {
+                firestore.collection(ConstValues.FOLLOW).document(userId).update(
                     "followers.$auth",
                     FieldValue.delete()
                 ).addOnSuccessListener {
@@ -146,13 +146,13 @@ class UserDetailViewModel : ViewModel() {
             following[userId] = true
 
             val follower = hashMapOf<String, Boolean>()
-            follower[auth] = true
+            follower[Firebase.auth.currentUser!!.uid] = true
 
-            firestore.collection("Follow").document(auth)
-                .set(mapOf("following" to following), SetOptions.merge())
+            firestore.collection(ConstValues.FOLLOW).document(Firebase.auth.currentUser!!.uid)
+                .set(mapOf(ConstValues.FOLLOWING to following), SetOptions.merge())
                 .addOnSuccessListener {
-                    firestore.collection("Follow").document(userId)
-                        .set(mapOf("followers" to follower), SetOptions.merge())
+                    firestore.collection(ConstValues.FOLLOW).document(userId)
+                        .set(mapOf(ConstValues.FOLLOWERS to follower), SetOptions.merge())
                         .addOnSuccessListener {
                             _isFollowing.postValue(true)
                         }.addOnFailureListener { exception ->
@@ -166,7 +166,7 @@ class UserDetailViewModel : ViewModel() {
 
     fun fetchUserInformation(userId: String) {
         _userInformation.postValue(Resource.Loading)
-        firestore.collection("Users")
+        firestore.collection(ConstValues.USERS)
             .document(userId)
             .get()
             .addOnSuccessListener { document ->
@@ -187,12 +187,12 @@ class UserDetailViewModel : ViewModel() {
     }
 
     fun checkIsFollowing(userId: String) {
-        firestore.collection("Follow").document(auth)
+        firestore.collection(ConstValues.FOLLOW).document(Firebase.auth.currentUser!!.uid)
             .get()
             .addOnSuccessListener { documentSnapshot ->
                 val follow = documentSnapshot.data
                 if (follow != null) {
-                    val following = follow["following"] as? HashMap<*, *>
+                    val following = follow[ConstValues.FOLLOWING] as? HashMap<*, *>
                     _isFollowing.postValue(following?.containsKey(userId) ?: false)
                 } else {
                     _isFollowing.postValue(false)

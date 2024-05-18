@@ -11,7 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
-import com.example.instagramapp.ConstValues
+import com.example.instagramapp.base.util.ConstValues
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentAddImageBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -22,17 +22,24 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class AddImageFragment : Fragment() {
     private lateinit var binding: FragmentAddImageBinding
-    private lateinit var auth: FirebaseAuth
-    private lateinit var firestore: FirebaseFirestore
-    private lateinit var storage: FirebaseStorage
     private var selectedImageBitmap: Bitmap? = null
     private val PICK_IMAGE_REQUEST = 71
 
+    @Inject
+    lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var firestore: FirebaseFirestore
+
+    @Inject
+    lateinit var storage: FirebaseStorage
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,7 +56,7 @@ class AddImageFragment : Fragment() {
         storage = Firebase.storage
         addImage()
         selectedImage()
-        btnBack()
+        initListeners()
     }
 
 
@@ -100,7 +107,11 @@ class AddImageFragment : Fragment() {
 
                 uploadImage(postId, postMap, ref)
             } else {
-                Toast.makeText(requireContext(), R.string.please_select_an_image, Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    requireContext(),
+                    R.string.please_select_an_image,
+                    Toast.LENGTH_SHORT
+                )
                     .show()
                 binding.progressBar.visibility = View.GONE
 
@@ -128,7 +139,11 @@ class AddImageFragment : Fragment() {
                         addProductInfoToFireStore(postMap, ref)
                     }
                 }.addOnFailureListener {
-                    Toast.makeText(requireContext(), R.string.failed_to_upload_image, Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.failed_to_upload_image,
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
                 }
         }
@@ -145,9 +160,9 @@ class AddImageFragment : Fragment() {
     }
 
 
-    private fun btnBack() {
+    private fun initListeners() {
         binding.btnBack.setOnClickListener {
-            findNavController().navigate(R.id.action_addImageFragment_to_profileFragment)
+            findNavController().popBackStack()
         }
     }
 }

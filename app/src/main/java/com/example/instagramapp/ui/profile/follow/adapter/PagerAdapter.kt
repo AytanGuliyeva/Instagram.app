@@ -1,11 +1,11 @@
-package com.example.instagramapp.ui.profile.adapter
+package com.example.instagramapp.ui.profile.follow.adapter
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.instagramapp.ui.profile.FollowerFragment
-import com.example.instagramapp.ui.profile.FollowingFragment
+import com.example.instagramapp.ui.profile.follow.follower.FollowerFragment
+import com.example.instagramapp.ui.profile.follow.following.FollowingFragment
 
 class PagerAdapter(
     fragmentManager: FragmentManager,

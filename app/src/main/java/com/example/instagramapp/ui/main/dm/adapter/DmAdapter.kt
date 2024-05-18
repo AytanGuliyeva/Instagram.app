@@ -1,14 +1,11 @@
-package com.example.instagramapp.ui.main.dm
+package com.example.instagramapp.ui.main.dm.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.instagramapp.databinding.CommentsItemBinding
 import com.example.instagramapp.databinding.SearchUserItemBinding
-import com.example.instagramapp.ui.main.model.Chat
-import kotlin.math.log
+import com.example.instagramapp.data.model.Chat
 
 class DmAdapter(
     private val messageClick: (currentUser: String) -> Unit,

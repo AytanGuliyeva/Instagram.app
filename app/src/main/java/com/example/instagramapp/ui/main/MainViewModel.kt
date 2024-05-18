@@ -1,18 +1,15 @@
 package com.example.instagramapp.ui.main
 
-import Post
+import com.example.instagramapp.data.model.Post
 import android.util.Log
-import android.widget.ImageView
-import android.widget.TextView
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.instagramapp.ConstValues
-import com.example.instagramapp.R
-import com.example.instagramapp.ui.main.model.Story
-import com.example.instagramapp.ui.search.model.LikeCount
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.base.util.ConstValues
+import com.example.instagramapp.data.model.Story
+import com.example.instagramapp.data.model.LikeCount
+import com.example.instagramapp.base.util.Resource
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -20,13 +17,12 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
-import javax.security.auth.callback.Callback
-import kotlin.math.log
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class MainViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
-
+@HiltViewModel
+class MainViewModel @Inject constructor(val firestore: FirebaseFirestore, val auth: FirebaseAuth) :
+    ViewModel() {
 
     val postList = mutableListOf<Pair<Post, String>>()
     val likeCountList = mutableListOf<LikeCount>()
@@ -34,7 +30,6 @@ class MainViewModel : ViewModel() {
     private val _postResult = MutableLiveData<Resource<List<Pair<Post, String>>>>()
     val postResult: LiveData<Resource<List<Pair<Post, String>>>>
         get() = _postResult
-
 
     private val _storyResult = MutableLiveData<Resource<List<Story>>>()
     val storyResult: LiveData<Resource<List<Story>>>
@@ -50,27 +45,23 @@ class MainViewModel : ViewModel() {
     init {
         fetchPosts()
     }
-    // followList.clear()
-    // followList.addAll(followingUserIds.map { it.toString() }) /
 
     private fun fetchPosts() {
         _loading.postValue(true)
         val currentUserUid = Firebase.auth.currentUser?.uid
         if (currentUserUid != null) {
-            firestore.collection("Follow").document(currentUserUid).get()
+            firestore.collection(ConstValues.FOLLOW).document(currentUserUid).get()
                 .addOnSuccessListener { documentSnapshot ->
                     val followData = documentSnapshot.data
                     if (followData != null) {
                         val followingUserIds =
-                            (followData["following"] as? Map<*, *>)?.keys ?: emptySet()
-                        Log.e("TAG", "fetchPosts: $followingUserIds", )
+                            (followData[ConstValues.FOLLOWING] as? Map<*, *>)?.keys ?: emptySet()
                         followingUserIds.forEach { key ->
                             key as String
                             followList.add(key)
                         }
-                        Log.e("TAG", "fetchPosts: $followList", )
                         if (followingUserIds.isNotEmpty()) {
-                            firestore.collection("Posts")
+                            firestore.collection(ConstValues.POSTS)
                                 .whereIn(ConstValues.USER_ID, followingUserIds.toList())
                                 .get()
                                 .addOnSuccessListener { querySnapshot ->
@@ -92,7 +83,7 @@ class MainViewModel : ViewModel() {
 //                                            }
                                         }
                                     }
-                            //        likeCount()
+                                    //        likeCount()
 //                                    _postResult.postValue(Resource.Success(postList))
                                 }
                                 .addOnFailureListener {
@@ -118,7 +109,7 @@ class MainViewModel : ViewModel() {
         val savedData = hashMapOf(
             postId to true
         )
-        firestore.collection("Saves").document(auth.currentUser!!.uid)
+        firestore.collection(ConstValues.SAVES).document(auth.currentUser!!.uid)
             .set(savedData, SetOptions.merge())
             .addOnSuccessListener {
                 Log.d("addSavedToFirestore", "Save added successfully")
@@ -129,7 +120,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun removeSaveFromFirestore(postId: String) {
-        firestore.collection("Saves").document(auth.currentUser!!.uid)
+        firestore.collection(ConstValues.SAVES).document(auth.currentUser!!.uid)
             .update(postId, FieldValue.delete())
             .addOnSuccessListener {
                 Log.d("removeSaveFromFirestore", "Save removed successfully")
@@ -138,9 +129,9 @@ class MainViewModel : ViewModel() {
                 Log.e("removeSaveFromFirestore", "Error removing save: $exception")
             }
     }
-     fun toggleSaveStatus(postId: String, tag: String) {
-      //  val tag = imageView.tag?.toString() ?: ""
 
+    fun toggleSaveStatus(postId: String, tag: String) {
+        //  val tag = imageView.tag?.toString() ?: ""
         if (tag == "saved") {
 //            imageView.setImageResource(R.drawable.save_icon)
 //            imageView.tag = "save"
@@ -151,9 +142,10 @@ class MainViewModel : ViewModel() {
             addSaveToFirebase(postId)
         }
     }
+
     //like
     private fun checkLikeStatus(post: Post) {
-        firestore.collection("Likes").document(post.postId).get()
+        firestore.collection(ConstValues.LIKES).document(post.postId).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
                     val likedByCurrentUser =
@@ -165,7 +157,6 @@ class MainViewModel : ViewModel() {
                                 time = Timestamp(formattedTimestamp),
                                 isLiked = likedByCurrentUser
                             )
-                        Log.e("TAG", "fetch: $postWithFormattedTime")
                         postList.add(Pair(postWithFormattedTime, ""))
                         _postResult.postValue(Resource.Success(postList))
 
@@ -223,7 +214,7 @@ class MainViewModel : ViewModel() {
         val likeData = hashMapOf(
             auth.currentUser!!.uid to true
         )
-        firestore.collection("Likes").document(postId).set(likeData, SetOptions.merge())
+        firestore.collection(ConstValues.LIKES).document(postId).set(likeData, SetOptions.merge())
             .addOnSuccessListener {
                 Log.d("addLikeToFirestore", "Like added successfully")
             }
@@ -233,7 +224,7 @@ class MainViewModel : ViewModel() {
     }
 
     private fun removeLikeFromFirestore(postId: String) {
-        firestore.collection("Likes").document(postId)
+        firestore.collection(ConstValues.LIKES).document(postId)
             .update(auth.currentUser!!.uid, FieldValue.delete())
             .addOnSuccessListener {
                 Log.d("removeLikeFromFirestore", "Like removed successfully")
@@ -244,9 +235,9 @@ class MainViewModel : ViewModel() {
     }
 
     //story
-     fun readStory() {
+    fun readStory() {
 
-        firestore.collection("Story").get().addOnSuccessListener { value ->
+        firestore.collection(ConstValues.STORY).get().addOnSuccessListener { value ->
             if (value != null) {
                 _storyResult.postValue(Resource.Loading)
                 val storyList = ArrayList<Story>()
@@ -254,9 +245,8 @@ class MainViewModel : ViewModel() {
                 val timecurrent = System.currentTimeMillis()
                 for (document in value.documents) {
                     var countStory = 0
-                    Log.e("TAG", "readStory: $followList", )
                     if (followList.contains(document.id)) {
-                        val stories = document.data as? HashMap<*,*>
+                        val stories = document.data as? HashMap<*, *>
                         if (stories != null) {
                             for (storyIds in stories) {
                                 val story = storyIds.value as? HashMap<*, *>
@@ -271,12 +261,10 @@ class MainViewModel : ViewModel() {
                                     }
                                     ustory = Story(storyId, userId, imageurl, timestart, timeend)
                                 }
-
                             }
                             if (countStory > 0) {
                                 if (ustory != null) {
                                     storyList.add(ustory)
-                                    Log.e("TAG", "readStory: $storyList", )
                                 }
                             }
                         }
@@ -287,21 +275,17 @@ class MainViewModel : ViewModel() {
                     it.timeStart
                 }
 
-                storyList.add(0, Story("", Firebase.auth.currentUser!!.uid, "", 0,0 ))
+                storyList.add(0, Story("", Firebase.auth.currentUser!!.uid, "", 0, 0))
 
                 _storyResult.postValue(Resource.Success(storyList))
-                Log.e("TAG", "readStory: $storyList", )
-
-
             }
 
-        }.addOnFailureListener {exception->
-            _storyResult.postValue( Resource.Error(exception))
+        }.addOnFailureListener { exception ->
+            _storyResult.postValue(Resource.Error(exception))
         }
-
     }
 
-//    fun fetchUsername(userId: String, post: Post) {
+//    fun fetchUsername(userId: String, post: com.example.instagramapp.data.model.Post) {
 //        firestore.collection("Users")
 //            .document(userId)
 //            .get()

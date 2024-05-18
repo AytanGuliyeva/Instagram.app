@@ -11,13 +11,14 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentSignUpBinding
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.base.util.Resource
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SignUpFragment : Fragment() {
     private lateinit var binding: FragmentSignUpBinding
-    private val viewModel: SignUpViewModel by viewModels()
+    val viewModel: SignUpViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,12 +45,13 @@ class SignUpFragment : Fragment() {
                     email
                 )
             ) {
-                Toast.makeText(requireContext(), "All fields are required", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(),
+                    getString(R.string.all_fields_are_required), Toast.LENGTH_SHORT)
                     .show()
             } else if (password.length < 6) {
                 Toast.makeText(
                     requireContext(),
-                    "Password must have at least 6 characters",
+                    getString(R.string.password_must_have_at_least_6_characters),
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
@@ -83,7 +85,7 @@ class SignUpFragment : Fragment() {
             is FirebaseAuthUserCollisionException -> {
                 Toast.makeText(
                     requireContext(),
-                    "User with this email already exists",
+                    getString(R.string.user_with_this_email_already_exists),
                     Toast.LENGTH_SHORT
                 ).show()
             }

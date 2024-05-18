@@ -1,39 +1,33 @@
 package com.example.instagramapp.ui.profile
 
-import Post
-import ProfileViewModel
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
+import com.example.instagramapp.data.model.Post
 import android.os.Bundle
-import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentProfileBinding
 import com.example.instagramapp.ui.profile.adapter.PostAdapter
-import com.example.instagramapp.ui.search.SearchFragmentDirections
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
+import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding
     private lateinit var postAdapter: PostAdapter
-    private val auth = Firebase.auth.currentUser!!.uid
-    private val viewModel: ProfileViewModel by viewModels()
+    val viewModel: ProfileViewModel by viewModels()
     private var selectedPost: Post? = null
+
+    @Inject
+    lateinit var auth: FirebaseAuth
 
 
     override fun onCreateView(
@@ -52,8 +46,6 @@ class ProfileFragment : Fragment() {
         follow()
         viewModel.fetchUserInformation()
         viewModel.fetchPosts()
-
-
 
         viewModel.postResult.observe(viewLifecycleOwner) { resource ->
             when (resource) {
@@ -151,11 +143,13 @@ class ProfileFragment : Fragment() {
 
     private fun follow() {
         binding.txtFollowingCount.setOnClickListener {
-            val action = ProfileFragmentDirections.actionProfileFragmentToFollowFragment(auth)
+            val action =
+                ProfileFragmentDirections.actionProfileFragmentToFollowFragment(auth.currentUser!!.uid)
             findNavController().navigate(action)
         }
         binding.txtFollowersCount.setOnClickListener {
-            val action = ProfileFragmentDirections.actionProfileFragmentToFollowFragment(auth)
+            val action =
+                ProfileFragmentDirections.actionProfileFragmentToFollowFragment(auth.currentUser!!.uid)
             findNavController().navigate(action)
         }
     }

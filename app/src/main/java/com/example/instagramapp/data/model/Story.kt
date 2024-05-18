@@ -1,4 +1,4 @@
-package com.example.instagramapp.ui.main.model
+package com.example.instagramapp.data.model
 
 data class Story(
     val storyId: String="",

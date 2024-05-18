@@ -1,6 +1,6 @@
-package com.example.instagramapp.ui.search
+package com.example.instagramapp.ui.search.userDetail
 
-import Post
+import com.example.instagramapp.data.model.Post
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,21 +8,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentUserDetailBinding
-import com.example.instagramapp.ui.profile.ProfileFragmentDirections
 import com.example.instagramapp.ui.profile.adapter.PostAdapter
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class UserDetailFragment : Fragment() {
     private lateinit var binding: FragmentUserDetailBinding
-    private val viewModel: UserDetailViewModel by viewModels()
+     val viewModel: UserDetailViewModel by viewModels()
     private lateinit var postAdapter: PostAdapter
     val args: UserDetailFragmentArgs by navArgs()
     private var selectedPost: Post? = null
@@ -76,7 +75,7 @@ class UserDetailFragment : Fragment() {
 
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
-                    Toast.makeText(requireContext(), "Error occurred!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.error_occurred), Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
@@ -87,8 +86,9 @@ class UserDetailFragment : Fragment() {
         viewModel.postSize.observe(viewLifecycleOwner) { postCount ->
             binding.txtPostCount.text = postCount.toString()
         }
-        btnFollow()
-        btnBack()
+        buttonFollow()
+        initListener()
+        buttonMessage()
     }
 
     private fun observeUserResult() {
@@ -150,18 +150,24 @@ class UserDetailFragment : Fragment() {
 
     }
 
-    private fun btnBack() {
+    private fun initListener() {
         binding.btnBack.setOnClickListener {
-            val action = UserDetailFragmentDirections.actionUserDetailFragmentToSearchFragment()
-            findNavController().navigate(action)
+            findNavController().popBackStack()
         }
     }
 
-    private fun btnFollow() {
+    private fun buttonFollow() {
         binding.btnFollow.setOnClickListener {
             viewModel.followClickListener(args.userId)
         }
     }
+    private fun buttonMessage(){
+        binding.btnMessage.setOnClickListener {
+            val action=UserDetailFragmentDirections.actionUserDetailFragmentToMessagesFragment(args.userId)
+            findNavController().navigate(action)
+        }
+    }
+
 
     private fun follow() {
         binding.txtFollowingCount.setOnClickListener {

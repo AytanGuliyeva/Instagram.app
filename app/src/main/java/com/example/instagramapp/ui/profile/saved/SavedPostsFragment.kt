@@ -1,4 +1,4 @@
-package com.example.instagramapp.ui.profile
+package com.example.instagramapp.ui.profile.saved
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -12,14 +12,14 @@ import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentSavedPostsBinding
 import com.example.instagramapp.ui.main.comment.CommentsBottomSheetFragment
 import com.example.instagramapp.ui.search.adapter.PostSearchAdapter
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.base.util.Resource
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class SavedPostsFragment : Fragment() {
     private lateinit var binding: FragmentSavedPostsBinding
-    private val viewModel: SavedPostsViewModel by viewModels()
+    val viewModel: SavedPostsViewModel by viewModels()
     private lateinit var postAdapter: PostSearchAdapter
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,15 +32,12 @@ class SavedPostsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        btnBack()
+        initListener()
         viewModel.fetchSavedPosts()
         setupRecyclerView()
         viewModel.savedPosts.observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Loading -> {
-                    // Show loading progress if needed
-                }
+                is Resource.Loading -> {}
 
                 is Resource.Success -> {
                     postAdapter.submitList(resource.data)
@@ -57,7 +54,7 @@ class SavedPostsFragment : Fragment() {
         }
     }
 
-    private fun btnBack() {
+    private fun initListener() {
         binding.btnBack.setOnClickListener {
             findNavController().popBackStack() //TODO migrate back button callbacks to popbackstack
         }
@@ -65,36 +62,32 @@ class SavedPostsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         postAdapter = PostSearchAdapter(itemClick = {
-            // selectedPost = it;postDetail(selectedPost!!.postId, selectedPost!!.userId)
-        }, commentButtonClick = {postId ->
+        }, commentButtonClick = { postId ->
             val bottomSheet = CommentsBottomSheetFragment.newInstance(postId)
             bottomSheet.show(childFragmentManager, bottomSheet.tag)
         }, likeButtonClick = { postId, imageView ->
             val tag = imageView.tag?.toString() ?: ""
-            if (tag == "liked") {
+            if (tag == getString(R.string.liked)) {
                 viewModel.toggleLikeStatus(postId, tag)
                 imageView.setImageResource(R.drawable.like_icon)
-                imageView.tag = "like"
+                imageView.tag = getString(R.string.unlike)
             } else {
                 viewModel.toggleLikeStatus(postId, tag)
                 imageView.setImageResource(R.drawable.icon_liked)
-                imageView.tag = "liked"
+                imageView.tag = getString(R.string.liked)
             }
         }, saveButtonClick = { postId, imageView ->
             val tag = imageView.tag?.toString() ?: ""
-            if (tag == "saved") {
+            if (tag == getString(R.string.saved)) {
                 viewModel.toggleSaveStatus(postId, tag)
                 imageView.setImageResource(R.drawable.save_icon)
-                imageView.tag = "save"
+                imageView.tag = getString(R.string.save)
             } else {
                 viewModel.toggleSaveStatus(postId, tag)
                 imageView.setImageResource(R.drawable.icons8_saved_icon)
-                imageView.tag = "saved"
-
+                imageView.tag = getString(R.string.saved)
             }
         })
         binding.rvSaved.adapter = postAdapter
     }
-
-
 }

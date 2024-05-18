@@ -12,57 +12,83 @@ import com.example.instagramapp.databinding.FragmentLoginBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
-    private lateinit var auth: FirebaseAuth
+    private var token:String?=null
+
+
+
+    @Inject
+    lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var firestore: FirebaseFirestore
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentLoginBinding.inflate(inflater,container,false)
+        binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+       // readPreference()
         auth = Firebase.auth
         checkLogin()
         btnLogin()
-        btnSignUp()
+        initNavigationListeners()
 
     }
-    private fun btnLogin(){
+
+    private fun btnLogin() {
         binding.btnLogin.setOnClickListener {
             val username = binding.edtUsername.text.toString()
             val password = binding.edtPassword.text.toString()
             if (username.isNotEmpty() && password.isNotEmpty()) {
                 binding.progressBar.visibility = View.VISIBLE
                 auth.signInWithEmailAndPassword(
-                    username,password
+                    username, password
                 ).addOnSuccessListener {
                     binding.progressBar.visibility = View.GONE
                     findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
+
                 }.addOnFailureListener {
                     binding.progressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(requireContext(),
-                    getString(R.string.incorrect_username_or_password), Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.incorrect_username_or_password), Toast.LENGTH_SHORT
+                )
                     .show()
             }
         }
     }
-    private fun checkLogin(){
-        if (auth.currentUser!=null){
+
+//    private fun readPreference() {
+//        activity?.let {
+//            val sharedPreferences = it.getSharedPreferences("userPreference", Context.MODE_PRIVATE)
+//            token = sharedPreferences.getString("token", "")
+//            Log.e("TAG", "readPreference: $token", )
+//        }
+//    }
+    private fun checkLogin() {
+        if (auth.currentUser != null) {
             findNavController().navigate(R.id.action_loginFragment_to_mainFragment)
 
         }
     }
-    private fun btnSignUp(){
+
+    private fun initNavigationListeners() {
         binding.btnCreateNewAccount.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
         }

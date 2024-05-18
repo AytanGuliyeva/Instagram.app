@@ -8,10 +8,10 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.instagramapp.ConstValues
+import com.example.instagramapp.base.util.ConstValues
 import com.example.instagramapp.databinding.CommentsItemBinding
-import com.example.instagramapp.ui.main.model.Comments
-import com.example.instagramapp.ui.search.model.Users
+import com.example.instagramapp.data.model.Comments
+import com.example.instagramapp.data.model.Users
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -84,8 +84,6 @@ class CommentsAdapter() : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder
                 }
             }
             fetchUsername(comments.userId)
-
-            // binding.txtUsername.text=comments.userId
         }
 
         private fun fetchUsername(userId: String) {
@@ -99,7 +97,6 @@ class CommentsAdapter() : RecyclerView.Adapter<CommentsAdapter.CommentViewHolder
                     Glide.with(binding.root.context.applicationContext)
                         .load(user?.imageUrl)
                         .into(binding.imgProfile)
-
 
                 }
                 .addOnFailureListener { exception ->

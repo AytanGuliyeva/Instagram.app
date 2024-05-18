@@ -6,54 +6,53 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.instagramapp.ConstValues
+import com.example.instagramapp.base.util.ConstValues
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.AddStoryBinding
-import com.example.instagramapp.ui.main.model.Story
-import com.google.firebase.auth.FirebaseAuth
+import com.example.instagramapp.data.model.Story
 import com.google.firebase.firestore.FirebaseFirestore
 
-class StoryAdapter( private var storyList: List<Story>,
-                    private val storyClick: (item: String) -> Unit,
-                    private val addStoryClick: () -> Unit,
+class StoryAdapter(
+    private var storyList: List<Story>,
+    private val storyClick: (item: String) -> Unit,
+    private val addStoryClick: () -> Unit,
 
-                    ):RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
+    ) : RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
     private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
         val binding =
             AddStoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return StoryViewHolder(binding)    }
+        return StoryViewHolder(binding)
+    }
 
     override fun getItemCount(): Int {
-      return storyList.size
+        return storyList.size
     }
 
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
-        holder.bind(storyList[position],position)
+        holder.bind(storyList[position], position)
     }
-    inner class StoryViewHolder(private val binding: AddStoryBinding):RecyclerView.ViewHolder(binding.root){
-        fun bind(story: Story,position: Int){
+
+    inner class StoryViewHolder(private val binding: AddStoryBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(story: Story, position: Int) {
             userInfo(story.userId, position)
-            if (position==0){
-                binding.addStory.visibility= View.VISIBLE
-            }else{
-                binding.addStory.visibility=View.GONE
+            if (position == 0) {
+                binding.addStory.visibility = View.VISIBLE
+            } else {
+                binding.addStory.visibility = View.GONE
             }
             binding.profilImage.setOnClickListener {
                 if (position == 0) {
                     addStoryClick()
-                   // myStory(binding.username, true)
                 } else {
                     storyClick(story.userId)
                 }
-
             }
         }
 
         private fun userInfo(userId: String, position: Int) {
-            firestore.collection("Users").document(userId)
+            firestore.collection(ConstValues.USERS).document(userId)
                 .get().addOnSuccessListener { value ->
                     if (value != null) {
                         val username = value.get(ConstValues.USERNAME) as String
@@ -69,13 +68,9 @@ class StoryAdapter( private var storyList: List<Story>,
                         }
                     }
 
-
                 }.addOnFailureListener {
-
                     it.localizedMessage?.let { it1 -> Log.e("user_error", it1) }
                 }
-
         }
     }
-
 }

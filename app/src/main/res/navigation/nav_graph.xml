@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/splashScreenFragment"
-        android:name="com.example.instagramapp.SplashScreenFragment"
+        android:name="com.example.instagramapp.ui.splashscreen.SplashScreenFragment"
         android:label="fragment_splash_screen"
         tools:layout="@layout/fragment_splash_screen" >
         <action
@@ -55,6 +55,9 @@
         <action
             android:id="@+id/action_mainFragment_to_addStoryFragment"
             app:destination="@id/addStoryFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_dmFragment"
+            app:destination="@id/dmFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -104,7 +107,7 @@
     </fragment>
     <dialog
         android:id="@+id/settingFragment"
-        android:name="com.example.instagramapp.ui.profile.SettingFragment"
+        android:name="com.example.instagramapp.ui.profile.setting.SettingFragment"
         android:label="SettingFragment" >
         <action
             android:id="@+id/action_settingFragment_to_loginFragment"
@@ -117,7 +120,7 @@
     </dialog>
     <fragment
         android:id="@+id/userDetailFragment"
-        android:name="com.example.instagramapp.ui.search.UserDetailFragment"
+        android:name="com.example.instagramapp.ui.search.userDetail.UserDetailFragment"
         android:label="fragment_user_detail"
         tools:layout="@layout/fragment_user_detail" >
         <action
@@ -134,10 +137,13 @@
         <action
             android:id="@+id/action_userDetailFragment_to_followFragment"
             app:destination="@id/followFragment" />
+        <action
+            android:id="@+id/action_userDetailFragment_to_messagesFragment"
+            app:destination="@id/messagesFragment" />
     </fragment>
     <fragment
         android:id="@+id/postDetailFragment"
-        android:name="com.example.instagramapp.ui.profile.PostDetailFragment"
+        android:name="com.example.instagramapp.ui.profile.postDetail.PostDetailFragment"
         android:label="fragment_post_detail"
         tools:layout="@layout/fragment_post_detail" >
 
@@ -167,7 +173,7 @@
     </fragment>
     <fragment
         android:id="@+id/followFragment"
-        android:name="com.example.instagramapp.ui.profile.FollowFragment"
+        android:name="com.example.instagramapp.ui.profile.follow.FollowFragment"
         android:label="fragment_follow"
         tools:layout="@layout/fragment_follow" >
         <action
@@ -186,7 +192,7 @@
     </fragment>
     <fragment
         android:id="@+id/followingFragment"
-        android:name="com.example.instagramapp.ui.profile.FollowingFragment"
+        android:name="com.example.instagramapp.ui.profile.follow.following.FollowingFragment"
         android:label="fragment_following"
         tools:layout="@layout/fragment_following" >
         <argument
@@ -198,7 +204,7 @@
     </fragment>
     <fragment
         android:id="@+id/followerFragment"
-        android:name="com.example.instagramapp.ui.profile.FollowerFragment"
+        android:name="com.example.instagramapp.ui.profile.follow.follower.FollowerFragment"
         android:label="fragment_follower"
         tools:layout="@layout/fragment_follower" >
         <argument
@@ -210,7 +216,7 @@
     </fragment>
     <fragment
         android:id="@+id/editProfileFragment"
-        android:name="com.example.instagramapp.ui.profile.EditProfileFragment"
+        android:name="com.example.instagramapp.ui.profile.edit.EditProfileFragment"
         android:label="fragment_edit_profile"
         tools:layout="@layout/fragment_edit_profile" >
         <action
@@ -221,7 +227,7 @@
     </fragment>
     <fragment
         android:id="@+id/savedPostsFragment"
-        android:name="com.example.instagramapp.ui.profile.SavedPostsFragment"
+        android:name="com.example.instagramapp.ui.profile.saved.SavedPostsFragment"
         android:label="fragment_saved_posts"
         tools:layout="@layout/fragment_saved_posts" >
         <action
@@ -249,4 +255,22 @@
         android:name="com.example.instagramapp.ui.main.story.AddStoryFragment"
         android:label="fragment_add_story"
         tools:layout="@layout/fragment_add_story" />
+    <fragment
+        android:id="@+id/dmFragment"
+        android:name="com.example.instagramapp.ui.main.dm.DmFragment"
+        android:label="fragment_dm"
+        tools:layout="@layout/fragment_dm" >
+        <action
+            android:id="@+id/action_dmFragment_to_messagesFragment"
+            app:destination="@id/messagesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/messagesFragment"
+        android:name="com.example.instagramapp.ui.main.messages.MessagesFragment"
+        android:label="fragment_messages"
+        tools:layout="@layout/fragment_messages" >
+        <argument
+            android:name="userId"
+            app:argType="string" />
+    </fragment>
 </navigation>

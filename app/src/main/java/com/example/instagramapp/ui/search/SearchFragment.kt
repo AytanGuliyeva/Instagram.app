@@ -1,9 +1,7 @@
 package com.example.instagramapp.ui.search
 
-import Post
-import SearchViewModel
+import com.example.instagramapp.data.model.Post
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,27 +9,20 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentSearchBinding
-import com.example.instagramapp.ui.profile.ProfileFragmentDirections
 import com.example.instagramapp.ui.profile.adapter.PostAdapter
-import com.example.instagramapp.ui.search.adapter.PostSearchAdapter
-import com.example.instagramapp.ui.search.adapter.UserAdapter
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.ui.search.userDetail.adapter.UserAdapter
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.app
 import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SearchFragment : Fragment() {
     private lateinit var binding: FragmentSearchBinding
     private lateinit var userAdapter: UserAdapter
-
-    //  private lateinit var postAdapter: PostSearchAdapter
     private lateinit var postAdapter: PostAdapter
-    private val viewModel: SearchViewModel by viewModels()
+    val viewModel: SearchViewModel by viewModels()
     private var selectedUser: Users? = null
     private var selectedPost: Post? = null
 
@@ -76,7 +67,6 @@ class SearchFragment : Fragment() {
         )
         binding.rvUsername.adapter = userAdapter
         postAdapter = PostAdapter(itemClick = {
-            Log.e("TAG", "setupRecyclerView: ${it.postId} ")
             selectedPost = it
             postDetail(it.postId, it.userId)
         })
@@ -128,17 +118,6 @@ class SearchFragment : Fragment() {
             }
         }
     }
-
-//    private fun filterUsersByUsername(query: String?) {
-//        query?.let {
-//            if (query.isNotEmpty())
-//                viewModel.searchUsers(it) }
-//    }
-//private fun filterUsersByUsername(query: String?) {
-//    query?.let { viewModel.searchUsers(it) }
-//}
-
-
     private fun filterUsersByUsername(query: String?) {
         query?.let {
             viewModel.searchUsers(it)

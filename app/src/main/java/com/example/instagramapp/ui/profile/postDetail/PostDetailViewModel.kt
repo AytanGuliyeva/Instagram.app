@@ -1,35 +1,29 @@
-package com.example.instagramapp.ui.profile
+package com.example.instagramapp.ui.profile.postDetail
 
-import Post
+import com.example.instagramapp.data.model.Post
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.instagramapp.ConstValues
+import com.example.instagramapp.base.util.ConstValues
 import com.example.instagramapp.R
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
-import com.google.firebase.Timestamp
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.google.firebase.ktx.Firebase
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-class PostDetailViewModel : ViewModel() {
-
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = Firebase.auth.currentUser!!.uid
-
+@HiltViewModel
+class PostDetailViewModel @Inject constructor(
+    val firestore: FirebaseFirestore,
+    val auth: FirebaseAuth
+) : ViewModel() {
 
     private val _userInformation = MutableLiveData<Resource<Users>>()
     val userInformation: LiveData<Resource<Users>>
@@ -53,45 +47,43 @@ class PostDetailViewModel : ViewModel() {
 
     fun fetchPosts(postId: String) {
         _loading.postValue(true)
-        val postDocumentRef = firestore.collection("Posts").document(postId)
+        val postDocumentRef = firestore.collection(ConstValues.POSTS).document(postId)
         Log.d(TAG, "Fetching post with postId: $postId")
 
         postDocumentRef.get()
             .addOnSuccessListener { documentSnapshot ->
-                Log.d(TAG, "Post fetch success")
+                Log.d(TAG, "com.example.instagramapp.data.model.Post fetch success")
                 val post = documentSnapshot.toObject(Post::class.java)
                 if (post != null) {
                     _postResult.postValue(Resource.Success(post))
                 } else {
-                    _postResult.postValue(Resource.Error(Exception("Post data is null")))
+                    _postResult.postValue(Resource.Error(Exception("com.example.instagramapp.data.model.Post data is null")))
                 }
                 _loading.postValue(false)
             }
             .addOnFailureListener { exception ->
-                Log.e(TAG, "Post fetch failure: ${exception.message}")
+                Log.e(TAG, "com.example.instagramapp.data.model.Post fetch failure: ${exception.message}")
                 _postResult.postValue(Resource.Error(exception))
                 _loading.postValue(false)
             }
     }
 
     fun fetchCommentCount(postId: String) {
-        firestore.collection("Comments").document(postId)
+        firestore.collection(ConstValues.COMMENTS).document(postId)
             .get()
             .addOnSuccessListener { documentSnapshot ->
                 val comments = documentSnapshot.data?.size ?: 0
-
                 _commentCount.postValue(Resource.Success(comments))
             }
             .addOnFailureListener { exception ->
                 _commentCount.postValue(Resource.Error(exception))
-
                 Log.e("PostSearchAdapter", "Error getting comment count: $exception")
             }
     }
 
     fun fetchUserInformation(userId: String) {
         _userInformation.postValue(Resource.Loading)
-        firestore.collection("Users")
+        firestore.collection(ConstValues.USERS)
             .document(userId)
             .get()
             .addOnSuccessListener { document ->
@@ -171,11 +163,11 @@ class PostDetailViewModel : ViewModel() {
 
 
     fun checkLikeStatus(postId: String, imageView: ImageView) {
-        firestore.collection("Likes").document(postId).get()
+        firestore.collection(ConstValues.LIKES).document(postId).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
                     val likedByCurrentUser =
-                        document.getBoolean(auth) ?: false
+                        document.getBoolean(auth.currentUser!!.uid) ?: false
                     if (likedByCurrentUser) {
                         imageView.setImageResource(R.drawable.icon_liked)
                         imageView.tag = "liked"
@@ -195,9 +187,9 @@ class PostDetailViewModel : ViewModel() {
 
     private fun addLikeToFirestore(postId: String) {
         val likeData = hashMapOf(
-            auth to true
+            auth.currentUser!!.uid to true
         )
-        firestore.collection("Likes").document(postId).set(likeData, SetOptions.merge())
+        firestore.collection(ConstValues.LIKES).document(postId).set(likeData, SetOptions.merge())
             .addOnSuccessListener {
                 Log.d("addLikeToFirestore", "Like added successfully")
             }
@@ -207,8 +199,8 @@ class PostDetailViewModel : ViewModel() {
     }
 
     private fun removeLikeFromFirestore(postId: String) {
-        firestore.collection("Likes").document(postId)
-            .update(auth, FieldValue.delete())
+        firestore.collection(ConstValues.LIKES).document(postId)
+            .update(auth.currentUser!!.uid, FieldValue.delete())
             .addOnSuccessListener {
                 Log.d("removeLikeFromFirestore", "Like removed successfully")
             }
@@ -216,13 +208,13 @@ class PostDetailViewModel : ViewModel() {
                 Log.e("removeLikeFromFirestore", "Error removing like: $exception")
             }
     }
-    //save
 
+    //save
     fun addSaveToFirebase(postId: String) {
         val savedData = hashMapOf(
             postId to true
         )
-        firestore.collection("Saves").document(auth)
+        firestore.collection(ConstValues.SAVES).document(auth.currentUser!!.uid)
             .set(savedData, SetOptions.merge())
             .addOnSuccessListener {
                 Log.d("addSavedToFirestore", "Save added successfully")
@@ -233,7 +225,7 @@ class PostDetailViewModel : ViewModel() {
     }
 
     fun removeSaveFromFirestore(postId: String) {
-        firestore.collection("Saves").document(auth)
+        firestore.collection(ConstValues.SAVES).document(auth.currentUser!!.uid)
             .update(postId, FieldValue.delete())
             .addOnSuccessListener {
                 Log.d("removeSaveFromFirestore", "Save removed successfully")
@@ -244,7 +236,7 @@ class PostDetailViewModel : ViewModel() {
     }
 
     fun checkSaveStatus(postId: String, imageView: ImageView) {
-        firestore.collection("Saves").document(auth).get()
+        firestore.collection(ConstValues.SAVES).document(auth.currentUser!!.uid).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
                     val savedPostId = document.getBoolean(postId) ?: false

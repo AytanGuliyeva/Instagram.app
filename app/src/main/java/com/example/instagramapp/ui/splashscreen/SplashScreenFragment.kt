@@ -1,4 +1,4 @@
-package com.example.instagramapp.ui
+package com.example.instagramapp.ui.splashscreen
 
 import android.os.Bundle
 import android.os.Handler

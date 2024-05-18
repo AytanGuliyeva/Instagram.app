@@ -1,4 +1,4 @@
-package com.example.instagramapp.ui.search.model
+package com.example.instagramapp.data.model
 
 data class Users(
     val userId: String = "",

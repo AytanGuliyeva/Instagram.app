@@ -1,23 +1,23 @@
-import android.util.Log
+package com.example.instagramapp.ui.search
+
+import com.example.instagramapp.data.model.Post
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.instagramapp.ConstValues
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
-import com.google.firebase.Timestamp
+import com.example.instagramapp.base.util.ConstValues
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class SearchViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = Firebase.auth.currentUser!!.uid
-
+@HiltViewModel
+class SearchViewModel @Inject constructor(val firestore: FirebaseFirestore) : ViewModel() {
 
     private val _userResult = MutableLiveData<Resource<List<Users>>>()
     val userResult: LiveData<Resource<List<Users>>>
@@ -39,8 +39,8 @@ class SearchViewModel : ViewModel() {
 
     fun searchUsers(query: String) {
         _loading.value = true
-        firestore.collection("Users")
-            .orderBy("username")
+        firestore.collection(ConstValues.USERS)
+            .orderBy(ConstValues.USERNAME)
             .startAt(query)
             .endAt(query + "\uf8ff")
             .get()
@@ -69,40 +69,13 @@ class SearchViewModel : ViewModel() {
             }
     }
 
-    //    fun fetchOtherUsersPosts(userId: String) {
-//        _loading.value = true
-//        firestore.collection("Posts")
-//            .whereNotEqualTo("userId", userId)
-//            .get()
-//            .addOnSuccessListener { value ->
-//                val postList = mutableListOf<Post>()
-//                val hashSet = hashSetOf<Post>()
-//                for (post in value.documents) {
-//                    val caption = post.getString(ConstValues.CAPTION) ?: ""
-//                    val postId = post.getString(ConstValues.POST_ID) ?: ""
-//                    val userId = post.getString(ConstValues.USER_ID) ?: ""
-//                    val time = post.getTimestamp(ConstValues.TIME)
-//                    val imageUrl = post.getString(ConstValues.POST_IMAGE_URL) ?: ""
-//                    val post = Post(postId, caption, userId, time, imageUrl)
-//                    hashSet.add(post)
-//                }
-//                postList.addAll(hashSet)
-//                _postResult.value = Resource.Success(postList)
-//            }
-//            .addOnFailureListener { exception ->
-//                _postResult.value = Resource.Error(exception)
-//            }
-//            .addOnCompleteListener {
-//                _loading.value = false
-//            }
-//    }
     fun fetchOtherUsersPosts(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _loading.postValue(true)
             try {
                 val postList = mutableListOf<Post>()
                 val currentUserUid = Firebase.auth.currentUser?.uid
-                val value = firestore.collection("Posts").get()
+                val value = firestore.collection(ConstValues.POSTS).get()
                     .addOnSuccessListener {
 
                         for (postDoc in it.documents) {
@@ -126,19 +99,4 @@ class SearchViewModel : ViewModel() {
             }
         }
     }
-
-//    suspend fun checkIsFollowing(userId: String): Boolean {
-//        var isFollowing = false
-//        try {
-//            val documentSnapshot = firestore.collection("Follow").document(auth).get().await()
-//            val follow = documentSnapshot.data
-//            if (follow != null) {
-//                val following = follow["following"] as? HashMap<*, *>
-//                isFollowing = following?.containsKey(userId) ?: false
-//            }
-//        } catch (e: Exception) {
-//            Log.e("UserDetailViewModel", "Error getting follow data: $e")
-//        }
-//        return isFollowing
-//    }
 }

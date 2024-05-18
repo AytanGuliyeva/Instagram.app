@@ -44,10 +44,6 @@ android {
 
 dependencies {
     
-    //Dagger Hilt
-    implementation("com.google.dagger:hilt-android:2.50")
-    implementation("androidx.activity:activity:1.8.0")
-    kapt("com.google.dagger:hilt-android-compiler:2.50")
 
     //navigation component
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
@@ -86,6 +82,16 @@ dependencies {
     //story progress bar
     implementation ("com.github.shts:StoriesProgressView:3.0.0")
 
+
+    //Dagger Hilt
+    implementation("com.google.dagger:hilt-android:2.50")
+    implementation("androidx.activity:activity:1.8.0")
+    kapt("com.google.dagger:hilt-android-compiler:2.50")
+
+    //FCM
+    implementation ("com.google.firebase:firebase-messaging:19.0.1")
+
+    implementation("com.android.volley:volley:1.2.1")
 
 
     implementation("androidx.core:core-ktx:1.13.1")

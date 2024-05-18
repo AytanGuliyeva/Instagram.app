@@ -1,26 +1,22 @@
 package com.example.instagramapp.ui.search.adapter
 
-import Post
+import com.example.instagramapp.data.model.Post
 import android.content.ContentValues
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.RadioButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.instagramapp.ConstValues
+import com.example.instagramapp.base.util.ConstValues
 import com.example.instagramapp.R
 import com.example.instagramapp.databinding.PostItemBinding
-import com.example.instagramapp.databinding.SearchPostItemBinding
-import com.example.instagramapp.ui.search.model.LikeCount
-import com.example.instagramapp.ui.search.model.Users
+import com.example.instagramapp.data.model.LikeCount
+import com.example.instagramapp.data.model.Users
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -113,8 +109,6 @@ class PostSearchAdapter(
             binding.btnLike.setOnClickListener {
                 likeButtonClick(post.postId, binding.btnLike)
             }
-
-            // checkLikeStatus(post.postId, binding.btnLike)
             if (post.isLiked) {
                 binding.btnLike.setImageResource(R.drawable.icon_liked)
                 binding.btnLike.tag = "liked"
@@ -122,37 +116,18 @@ class PostSearchAdapter(
                 binding.btnLike.setImageResource(R.drawable.like_icon)
                 binding.btnLike.tag = "like"
             }
-           likeCount(binding.txtLikes, post.postId)
+            likeCount(binding.txtLikes, post.postId)
             binding.btnSaved.setOnClickListener {
                 saveButtonClick(post.postId, binding.btnSaved)
             }
-
-//            if (post.isLiked) {
-//                binding.btnLike.setImageResource(R.drawable.icon_liked)
-//                binding.btnLike.tag = "liked"
-//            } else {
-//                binding.btnLike.setImageResource(R.drawable.like_icon)
-//                binding.btnLike.tag = "like"
-//            }
-//            val currentLikeCount=likeCountList.find {
-//                it.postId == post.postId
-//            }
-//            if (currentLikeCount!=null){
-//                binding.txtLikes.text=currentLikeCount.likeCount.toString()
-//            }
-//            binding.btnSaved.setOnClickListener {
-//                toggleSaveStatus(post.postId, binding.btnSaved)
-//            }
-
             checkSaveStatus(post.postId, binding.btnSaved)
         }
 
         private fun fetchCommentCount(postId: String) {
-            firestore.collection("Comments").document(postId)
+            firestore.collection(ConstValues.COMMENTS).document(postId)
                 .get()
                 .addOnSuccessListener { documentSnapshot ->
                     val comments = documentSnapshot.data?.size ?: 0
-
                     val commentText = "View all $comments comments"
                     binding.txtComment.text = commentText
                 }
@@ -162,7 +137,7 @@ class PostSearchAdapter(
         }
 
         fun fetchUsername(userId: String) {
-            firestore.collection("Users")
+            firestore.collection(ConstValues.USERS)
                 .document(userId)
                 .get()
                 .addOnSuccessListener { documentSnapshot ->
@@ -207,43 +182,21 @@ class PostSearchAdapter(
 
         //like
         private fun likeCount(likes: TextView, postId: String) {
-            firestore.collection("Likes").document(postId).addSnapshotListener { value, error ->
-                if (error != null) {
-                    Log.e("likeCount", "Error fetching like count: $error")
-                    return@addSnapshotListener
+            firestore.collection(ConstValues.LIKES).document(postId)
+                .addSnapshotListener { value, error ->
+                    if (error != null) {
+                        Log.e("likeCount", "Error fetching like count: $error")
+                        return@addSnapshotListener
+                    }
+                    if (value != null && value.exists()) {
+                        val likesCount = value.data?.size ?: 0
+                        val likesString = "$likesCount likes"
+                        likes.text = likesString
+                    } else {
+                        likes.text = "0 likes"
+                    }
                 }
-                if (value != null && value.exists()) {
-                    val likesCount = value.data?.size ?: 0
-                    val likesString = "$likesCount likes"
-                    likes.text = likesString
-                } else {
-                    likes.text = "0 likes"
-                }
-            }
         }
-
-//        private fun checkLikeStatus(postId: String, imageView: ImageView) {
-//            firestore.collection("Likes").document(postId).get()
-//                .addOnSuccessListener { document ->
-//                    if (document.exists()) {
-//                        val likedByCurrentUser =
-//                            document.getBoolean(auth.currentUser!!.uid) ?: false
-//                        if (likedByCurrentUser) {
-//                            imageView.setImageResource(R.drawable.icon_liked)
-//                            imageView.tag = "liked"
-//                        } else {
-//                            imageView.setImageResource(R.drawable.like_icon)
-//                            imageView.tag = "like"
-//                        }
-//                    } else {
-//                        imageView.setImageResource(R.drawable.like_icon)
-//                        imageView.tag = "like"
-//                    }
-//                }
-//                .addOnFailureListener { exception ->
-//                    Log.e("checkLikeStatus", "Error checking like status: $exception")
-//                }
-//        }
 
 //        //for image url
 //        private fun fetchUserProfile(username: String) {
@@ -266,34 +219,9 @@ class PostSearchAdapter(
 //                }
 //        }
 
-        //save
-//        private fun addSaveToFirebase(postId: String) {
-//            val savedData = hashMapOf(
-//                postId to true
-//            )
-//            firestore.collection("Saves").document(auth.currentUser!!.uid)
-//                .set(savedData, SetOptions.merge())
-//                .addOnSuccessListener {
-//                    Log.d("addSavedToFirestore", "Save added successfully")
-//                }
-//                .addOnFailureListener { exception ->
-//                    Log.e("addSavedToFirestore", "Error adding save: $exception")
-//                }
-//        }
-//
-//        private fun removeSaveFromFirestore(postId: String) {
-//            firestore.collection("Saves").document(auth.currentUser!!.uid)
-//                .update(postId, FieldValue.delete())
-//                .addOnSuccessListener {
-//                    Log.d("removeSaveFromFirestore", "Save removed successfully")
-//                }
-//                .addOnFailureListener { exception ->
-//                    Log.e("removeSaveFromFirestore", "Error removing save: $exception")
-//                }
-//        }
 
         private fun checkSaveStatus(postId: String, imageView: ImageView) {
-            firestore.collection("Saves").document(auth.currentUser!!.uid).get()
+            firestore.collection(ConstValues.SAVES).document(auth.currentUser!!.uid).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
                         val savedPostId = document.getBoolean(postId) ?: false
@@ -313,24 +241,10 @@ class PostSearchAdapter(
                     Log.e("checkSaveStatus", "Error checking save status: $exception")
                 }
         }
-
-//        private fun toggleSaveStatus(postId: String, imageView: ImageView) {
-//            val tag = imageView.tag?.toString() ?: ""
-//
-//            if (tag == "saved") {
-//                imageView.setImageResource(R.drawable.save_icon)
-//                imageView.tag = "save"
-//                removeSaveFromFirestore(postId)
-//            } else {
-//                imageView.setImageResource(R.drawable.icons8_saved_icon)
-//                imageView.tag = "saved"
-//                addSaveToFirebase(postId)
-//            }
-//        }
     }
 }
 
-//        private fun shareWithWp(post: Post){
+//        private fun shareWithWp(post: com.example.instagramapp.data.model.Post){
 //            val shareText="Check this post: ${post.postImageUrl}"
 //            val sendIntent= Intent().apply {
 //                action= Intent.ACTION_SEND

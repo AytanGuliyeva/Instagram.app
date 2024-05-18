@@ -1,4 +1,4 @@
-package com.example.instagramapp.util
+package com.example.instagramapp.base.util
 
 sealed class Resource<out T : Any> {
     data class Success<out T : Any>(val data: T) : Resource<T>()

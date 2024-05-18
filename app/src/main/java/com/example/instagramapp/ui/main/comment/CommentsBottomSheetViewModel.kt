@@ -3,18 +3,21 @@ package com.example.instagramapp.ui.main.comment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.instagramapp.ConstValues
-import com.example.instagramapp.ui.main.model.Comments
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.base.util.ConstValues
+import com.example.instagramapp.data.model.Comments
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class CommentsBottomSheetViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
-    private lateinit var auth: FirebaseAuth
-
+@HiltViewModel
+class CommentsBottomSheetViewModel @Inject constructor(
+    val firestore: FirebaseFirestore,
+    val auth: FirebaseAuth
+) : ViewModel() {
     private val _commentResult = MutableLiveData<Resource<List<Comments>>>()
     val commentResult: LiveData<Resource<List<Comments>>>
         get() = _commentResult
@@ -25,7 +28,7 @@ class CommentsBottomSheetViewModel : ViewModel() {
 
 
     fun readComment(postId: String) {
-        firestore.collection("Comments").document(postId).addSnapshotListener { value, error ->
+        firestore.collection(ConstValues.COMMENTS).document(postId).addSnapshotListener { value, error ->
             if (error != null) {
                 return@addSnapshotListener
             }
@@ -57,7 +60,7 @@ class CommentsBottomSheetViewModel : ViewModel() {
 
 
     private fun allUsers(userIds: List<String>) {
-        firestore.collection("Users").get().addOnSuccessListener { value ->
+        firestore.collection(ConstValues.USERS).get().addOnSuccessListener { value ->
             if (value != null) {
                 val allUsersList = ArrayList<Users>()
                 for (users in value.documents) {
@@ -77,7 +80,7 @@ class CommentsBottomSheetViewModel : ViewModel() {
     fun getCurrentUserProfileImage(callback: (String) -> Unit) {
         val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
         currentUserUid?.let { uid ->
-            firestore.collection("Users").document(uid).get()
+            firestore.collection(ConstValues.USERS).document(uid).get()
                 .addOnSuccessListener { document ->
                     val imageUrl = document.getString(ConstValues.IMAGE_URL)
                     imageUrl?.let { callback(it) }

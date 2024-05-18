@@ -1,18 +1,27 @@
+package com.example.instagramapp.ui.profile
+
+import com.example.instagramapp.data.model.Post
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.instagramapp.ConstValues
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.base.util.ConstValues
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class ProfileViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = Firebase.auth.currentUser!!.uid
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
+    val firestore: FirebaseFirestore,
+    val auth: FirebaseAuth
+) : ViewModel() {
+
     private val _postResult = MutableLiveData<Resource<List<Post>>>()
     val postResult: LiveData<Resource<List<Post>>>
         get() = _postResult
@@ -43,8 +52,8 @@ class ProfileViewModel : ViewModel() {
 
     fun fetchUserInformation() {
         _userInformation.postValue(Resource.Loading)
-        firestore.collection("Users")
-            .document(auth)
+        firestore.collection(ConstValues.USERS)
+            .document(auth.currentUser!!.uid)
             .get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
@@ -86,42 +95,48 @@ class ProfileViewModel : ViewModel() {
     }
 
     private fun fetchFollowersCount() {
-        firestore.collection("Follow").document(auth)
+        firestore.collection(ConstValues.FOLLOW).document(auth.currentUser!!.uid)
             .get()
             .addOnSuccessListener { documentSnapshot ->
                 val follow = documentSnapshot.data
                 if (follow != null) {
-                    val followers = (follow["followers"] as? HashMap<*, *>)?.size ?: 0
+                    val followers = (follow[ConstValues.FOLLOWERS] as? HashMap<*, *>)?.size ?: 0
                     _followersCount.postValue(followers)
                 } else {
                     _followersCount.postValue(0)
                 }
             }
             .addOnFailureListener { exception ->
-                Log.e("ProfileViewModel", "Error getting followers count: $exception")
+                Log.e(
+                    "com.example.instagramapp.ui.profile.ProfileViewModel",
+                    "Error getting followers count: $exception"
+                )
             }
     }
 
     private fun fetchFollowingCount() {
-        firestore.collection("Follow").document(auth)
+        firestore.collection(ConstValues.FOLLOW).document(auth.currentUser!!.uid)
             .get()
             .addOnSuccessListener { documentSnapshot ->
                 val follow = documentSnapshot.data
                 if (follow != null) {
-                    val following = (follow["following"] as? HashMap<*, *>)?.size ?: 0
+                    val following = (follow[ConstValues.FOLLOWING] as? HashMap<*, *>)?.size ?: 0
                     _followingCount.postValue(following)
                 } else {
                     _followingCount.postValue(0)
                 }
             }
             .addOnFailureListener { exception ->
-                Log.e("ProfileViewModel", "Error getting following count: $exception")
+                Log.e(
+                    "com.example.instagramapp.ui.profile.ProfileViewModel",
+                    "Error getting following count: $exception"
+                )
             }
     }
 
     fun fetchPosts() {
         _loading.postValue(true)
-        firestore.collection("Posts").get()
+        firestore.collection(ConstValues.POSTS).get()
             .addOnSuccessListener { querySnapshot ->
                 val postList = mutableListOf<Post>()
                 for (document in querySnapshot.documents) {
@@ -143,6 +158,6 @@ class ProfileViewModel : ViewModel() {
     }
 
     companion object {
-        private const val TAG = "ProfileViewModel"
+        private const val TAG = "com.example.instagramapp.ui.profile.ProfileViewModel"
     }
 }

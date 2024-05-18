@@ -1,4 +1,4 @@
-package com.example.instagramapp.util
+package com.example.instagramapp.base.util
 
 
 object ConstValues {

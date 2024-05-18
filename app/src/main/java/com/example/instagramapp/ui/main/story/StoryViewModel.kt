@@ -4,19 +4,21 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.instagramapp.ConstValues
-import com.example.instagramapp.ui.main.model.Story
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.base.util.ConstValues
+import com.example.instagramapp.data.model.Story
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class StoryViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
+@HiltViewModel
+class StoryViewModel @Inject constructor(val firestore: FirebaseFirestore, val auth: FirebaseAuth) :
+    ViewModel() {
 
-    val storyList = ArrayList<Story>()
+    private val storyList = ArrayList<Story>()
     private val _userInformation = MutableLiveData<Resource<Users>>()
     val userInformation: LiveData<Resource<Users>>
         get() = _userInformation
@@ -44,7 +46,7 @@ class StoryViewModel : ViewModel() {
 //    }
     fun fetchUserInformation(userId: String) {
         _userInformation.postValue(Resource.Loading)
-        firestore.collection("Users")
+        firestore.collection(ConstValues.USERS)
             .document(userId)
             .get()
             .addOnSuccessListener { document ->
@@ -87,20 +89,18 @@ class StoryViewModel : ViewModel() {
     }
 
     fun addView(storyId: String, userId: String) {
-        firestore.collection("Story").document(userId)
+        firestore.collection(ConstValues.STORY).document(userId)
             .update("$storyId.views.${auth.currentUser!!.uid}", true)
     }
 
     fun getStories(userId: String) {
 
-        val ref = firestore.collection("Story").document(userId)
+        val ref = firestore.collection(ConstValues.STORY).document(userId)
         ref.get().addOnSuccessListener { value ->
             if (value != null && value.exists()) {
-
                 storyList.clear()
                 try {
                     val doc = value.data as HashMap<*, *>
-
                     val timecurrent = System.currentTimeMillis()
                     for (i in doc) {
                         val story = i.value as HashMap<*, *>
@@ -115,34 +115,15 @@ class StoryViewModel : ViewModel() {
                             storyList.add(storyi)
                         }
                         _storyInformation.postValue(Resource.Success(storyList))
-                        Log.e("TAG", "getStories: $storyList", )
-
+                        Log.e("TAG", "getStories: $storyList")
                     }
-
                     storyList.sortBy {
                         it.timeStart
                     }
-
-//                    if (storyList.isNotEmpty() && counter < storyList.size) {
-//                        storiesProgressView.setStoriesCount(storyList.size)
-//                        storiesProgressView.setStoryDuration(5000L)
-//                        storiesProgressView.setStoriesListener(this@StoryActivity)
-//                        storiesProgressView.startStories(counter)
-//                        Picasso.get().load(storyList[counter].imageurl).into(binding.image)
-//
-//                        addView(storyList[counter].storyId)
-//                    }
-
                 } catch (e: java.lang.NullPointerException) {
                     e.printStackTrace()
                 }
-
-
             }
-
-
         }
-
     }
-
 }

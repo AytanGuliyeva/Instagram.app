@@ -1,18 +1,19 @@
-package com.example.instagramapp.ui.profile
+package com.example.instagramapp.ui.profile.follow.follower
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.instagramapp.ConstValues
-import com.example.instagramapp.ui.search.model.Users
-import com.example.instagramapp.util.Resource
+import com.example.instagramapp.base.util.ConstValues
+import com.example.instagramapp.data.model.Users
+import com.example.instagramapp.base.util.Resource
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class FollowerViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
-
+@HiltViewModel
+class FollowerViewModel @Inject constructor(val firestore: FirebaseFirestore) : ViewModel() {
     private val _followerList = MutableLiveData<Resource<List<Users>>>()
     val followerResult: LiveData<Resource<List<Users>>>
         get() = _followerList
@@ -23,19 +24,15 @@ class FollowerViewModel : ViewModel() {
 
     fun fetchFollowers(userId: String) {
         _loading.value = true
-        firestore.collection("Follow").document(userId)
+        firestore.collection(ConstValues.FOLLOW).document(userId)
             .get()
             .addOnSuccessListener { documentSnapshot ->
                 try {
-
-
                     val idList = ArrayList<String>()
                     val follow = documentSnapshot.data
                     if (follow != null) {
-                        val followersMap = follow["followers"] as? HashMap<String, Boolean>
+                        val followersMap = follow[ConstValues.FOLLOWERS] as? HashMap<String, Boolean>
                         val followersIds = followersMap?.keys?.toList() ?: emptyList()
-                        Log.e("TAG", "fetchFollowers: ${followersIds.toString()}")
-
                         fetchUserDetails(followersIds)
                     } else {
                         _followerList.value = Resource.Error(Exception("No followers found"))
@@ -54,8 +51,8 @@ class FollowerViewModel : ViewModel() {
 
     private fun fetchUserDetails(userIds: List<String>) {
         val userDetails = mutableListOf<Users>()
-        firestore.collection("Users")
-            .whereIn("userId", userIds)
+        firestore.collection(ConstValues.USERS)
+            .whereIn(ConstValues.USER_ID, userIds)
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
