@@ -61,11 +61,9 @@
             android:contentDescription="@string/post"
             app:layout_constraintBottom_toTopOf="@id/guideline"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imgProfile"
-            app:layout_constraintVertical_bias="0.0" />
-<!--TODO do not use hardcoded size. Use percent or guideline instead-->
+            />
         <ImageButton
             android:id="@+id/btnLike"
             android:layout_width="wrap_content"

@@ -15,7 +15,7 @@
     <string name="create_a_password">Create a password</string>
     <string name="save_your_login_info">Save your login info?</string>
     <string name="we_ll_save_info">We\'ll save the login info for cloud,so you won\'t need to enter it next time you log in.</string>
-    <string name="save">Save</string>
+    <string name="save">save</string>
     <string name="not_now">Not now</string>
     <string name="what_s_your_birthday">What\'s your birthday?</string>
     <string name="use_your_own_birthday">Use your own birthday,even if this account is for a business, a pet or something else. No one will see this unless you choose to share it.</string>
@@ -50,7 +50,8 @@
     <string name="profile">profile</string>
     <string name="comment">comment</string>
     <string name="share">share</string>
-    <string name="saved">Saved</string>
+    <string name="saved">saved</string>
+    <string name="saved_toolbar_title">Saved</string>
     <string name="post">Post</string>
     <string name="option">option</string>
     <string name="menu">Menu</string>

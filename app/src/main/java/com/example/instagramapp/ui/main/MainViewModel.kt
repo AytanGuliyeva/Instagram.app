@@ -1,18 +1,24 @@
 package com.example.instagramapp.ui.main
 
+import android.content.ContentValues
 import com.example.instagramapp.data.model.Post
 import android.util.Log
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.bumptech.glide.Glide
+import com.example.instagramapp.R
 import com.example.instagramapp.base.util.ConstValues
 import com.example.instagramapp.data.model.Story
 import com.example.instagramapp.data.model.LikeCount
 import com.example.instagramapp.base.util.Resource
+import com.example.instagramapp.data.model.PostInfo
+import com.example.instagramapp.data.model.Users
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -24,11 +30,11 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(val firestore: FirebaseFirestore, val auth: FirebaseAuth) :
     ViewModel() {
 
-    val postList = mutableListOf<Pair<Post, String>>()
+    val postList = mutableListOf<PostInfo>()
     val likeCountList = mutableListOf<LikeCount>()
 
-    private val _postResult = MutableLiveData<Resource<List<Pair<Post, String>>>>()
-    val postResult: LiveData<Resource<List<Pair<Post, String>>>>
+    private val _postResult = MutableLiveData<Resource<List<PostInfo>>>()
+    val postResult: LiveData<Resource<List<PostInfo>>>
         get() = _postResult
 
     private val _storyResult = MutableLiveData<Resource<List<Story>>>()
@@ -44,6 +50,7 @@ class MainViewModel @Inject constructor(val firestore: FirebaseFirestore, val au
 
     init {
         fetchPosts()
+        readStory()
     }
 
     private fun fetchPosts() {
@@ -69,20 +76,13 @@ class MainViewModel @Inject constructor(val firestore: FirebaseFirestore, val au
                                     for (document in querySnapshot.documents) {
                                         val post = document.toObject(Post::class.java)
                                         post?.let { postDetail ->
-                                            checkLikeStatus(postDetail)
-                                            //   likeCount(postDetail)
-//                                            Log.e("TAG", "fetchPosts: $postDetail" )
-//                                            val formattedTimestamp = postDetail.time?.toDate()
-//                                            if (formattedTimestamp != null) {
-//                                                val postWithFormattedTime =
-//                                                    postDetail.copy(time = Timestamp(formattedTimestamp))
-////                                                Log.e("TAG", "fetch: $postWithFormattedTime", )
-//                                                postList.add(Pair(postWithFormattedTime, ""))
-//                                            } else {
-//                                                // Handle the case where post.time is null
-//                                            }
+                                            checkLikeStatus(PostInfo(post = postDetail))
+
                                         }
                                     }
+                                    Log.e("TAG", "fetchPosts: ${postList.size}")
+                                    Log.e("TAG", "fetchPosts1: $postList")
+
                                     //        likeCount()
 //                                    _postResult.postValue(Resource.Success(postList))
                                 }
@@ -131,35 +131,36 @@ class MainViewModel @Inject constructor(val firestore: FirebaseFirestore, val au
     }
 
     fun toggleSaveStatus(postId: String, tag: String) {
-        //  val tag = imageView.tag?.toString() ?: ""
         if (tag == "saved") {
-//            imageView.setImageResource(R.drawable.save_icon)
-//            imageView.tag = "save"
             removeSaveFromFirestore(postId)
         } else {
-//            imageView.setImageResource(R.drawable.icons8_saved_icon)
-//            imageView.tag = "saved"
             addSaveToFirebase(postId)
         }
     }
 
     //like
-    private fun checkLikeStatus(post: Post) {
-        firestore.collection(ConstValues.LIKES).document(post.postId).get()
+    private fun checkLikeStatus(postInfo: PostInfo) {
+        firestore.collection(ConstValues.LIKES).document(postInfo.post.postId).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
                     val likedByCurrentUser =
                         document.getBoolean(auth.currentUser!!.uid) ?: false
-                    val formattedTimestamp = post.time?.toDate()
+                    val hashMap = document.data as HashMap<*, *>
+                    val formattedTimestamp = postInfo.post.time?.toDate()
                     if (formattedTimestamp != null) {
                         val postWithFormattedTime =
-                            post.copy(
+                            postInfo.post.copy(
                                 time = Timestamp(formattedTimestamp),
                                 isLiked = likedByCurrentUser
                             )
-                        postList.add(Pair(postWithFormattedTime, ""))
-                        _postResult.postValue(Resource.Success(postList))
+                        // postList.add(Pair(postWithFormattedTime, ""))
+//                        _postResult.postValue(Resource.Success(postList))
+                        val newPostInfo = postInfo.copy(
+                            post = postWithFormattedTime,
+                            likeCount = hashMap.keys.size
 
+                        )
+                        commentCount(newPostInfo)
                     } else {
                         // Handle the case where post.time is null
                     }
@@ -172,35 +173,80 @@ class MainViewModel @Inject constructor(val firestore: FirebaseFirestore, val au
             }
     }
 
-//    fun likeCount() {
-//        postList.forEach {
-//            val (post, username) = it
-//            firestore.collection("Likes").addSnapshotListener { value, error ->
-//                if (error != null) {
-//
-//                    Log.e("likeCount", "Error fetching like count: $error")
-//                    return@addSnapshotListener
-//                }
-//
-//                if (value != null) {
-//                    for (document in value.documents) {
-//                        if (document.id == post.postId) {
-//                            val likesCount = document.data?.size ?: 0
-//                            likeCountList.add(LikeCount(post.postId, likesCount))
-//                            break
-//                        }
-//                    }
-//                    //likeCount.postValue(likeCountList)
-//                  //  val likesString = "$likesCount likes"
-//
-//                } else {
-//
-//                }
-//                likeCount.postValue(likeCountList)
-//            }
-//        }
-//
-//    }
+    fun commentCount(postInfo: PostInfo) {
+        firestore.collection(ConstValues.COMMENTS).document(postInfo.post.postId)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                val comments = documentSnapshot.data?.size ?: 0
+                val commentText = "View all $comments comments"
+                val newPostInfo = postInfo.copy(commentCount = comments)
+                // binding.txtComment.text = commentText
+                checkSaveStatus(newPostInfo)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("PostSearchAdapter", "Error getting comment count: $exception")
+            }
+    }
+
+    fun checkSaveStatus(postInfo: PostInfo) {
+        firestore.collection(ConstValues.SAVES).document(auth.currentUser!!.uid).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val isSaved = document.getBoolean(postInfo.post.postId) ?: false
+                    val post = postInfo.post.copy(isSave = isSaved)
+                    val newPostInfo = postInfo.copy(
+                        post = post
+                    )
+                    firestore.collection(ConstValues.USERS)
+                        .document(post.userId)
+                        .get()
+                        .addOnSuccessListener { documentSnapshot ->
+                            val user = documentSnapshot.toUser()
+                            val username = user?.username ?: ""
+
+
+                            postList.add(newPostInfo.copy(user = user))
+                            Log.e("TAG", "savePosts: $postList")
+                            Log.e("TAG", "fetchPosts: ${postList.size}")
+                            _postResult.postValue(Resource.Success(postList))
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e(
+                                ContentValues.TAG,
+                                "Failed to fetch username: ${exception.message}",
+                                exception
+                            )
+                        }
+
+
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("checkSaveStatus", "Error checking save status: $exception")
+            }
+    }
+
+    private fun DocumentSnapshot.toUser(): Users? {
+        return try {
+            val userId = getString(ConstValues.USER_ID)
+            val username = getString(ConstValues.USERNAME)
+            val email = getString(ConstValues.EMAIL)
+            val password = getString(ConstValues.PASSWORD)
+            val bio = getString(ConstValues.BIO)
+            val imageUrl = getString(ConstValues.IMAGE_URL)
+
+            Users(
+                userId.orEmpty(),
+                username.orEmpty(),
+                email.orEmpty(),
+                password.orEmpty(),
+                bio.orEmpty(),
+                imageUrl.orEmpty(),
+            )
+        } catch (e: Exception) {
+            null
+        }
+    }
 
     fun toggleLikeStatus(postId: String, tag: String) {
         if (tag == "liked") {
@@ -284,40 +330,4 @@ class MainViewModel @Inject constructor(val firestore: FirebaseFirestore, val au
             _storyResult.postValue(Resource.Error(exception))
         }
     }
-
-//    fun fetchUsername(userId: String, post: com.example.instagramapp.data.model.Post) {
-//        firestore.collection("Users")
-//            .document(userId)
-//            .get()
-//            .addOnSuccessListener { documentSnapshot ->
-//                val user = documentSnapshot.toUser()
-//                val username = user?.username ?: ""
-//            }
-//            .addOnFailureListener { exception ->
-//                Log.e(TAG, "Failed to fetch username: ${exception.message}", exception)
-//            }
-//    }
-//
-//    private fun DocumentSnapshot.toUser(): Users? {
-//        return try {
-//            val userId = getString(ConstValues.USER_ID)
-//            val username = getString(ConstValues.USERNAME)
-//            val email = getString(ConstValues.EMAIL)
-//            val password = getString(ConstValues.PASSWORD)
-//            val bio = getString(ConstValues.BIO)
-//            val imageUrl = getString(ConstValues.IMAGE_URL)
-//
-//            Users(
-//                userId.orEmpty(),
-//                username.orEmpty(),
-//                email.orEmpty(),
-//                password.orEmpty(),
-//                bio.orEmpty(),
-//                imageUrl.orEmpty(),
-//            )
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
-
 }

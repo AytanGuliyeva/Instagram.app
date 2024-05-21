@@ -42,16 +42,13 @@ class UserAdapter(
         holder.bind(diffUtil.currentList[position])
 
     }
-
     inner class UserViewHolder(private val binding: SearchUserItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Users) {
             Glide.with(binding.root)
                 .load(item.imageUrl)
                 .into(binding.imgProfile)
-
             binding.txtUsername.text = item.username
-
             itemView.setOnClickListener {
                 itemClick(item)
             }

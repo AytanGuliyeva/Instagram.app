@@ -26,11 +26,10 @@ class SearchFragment : Fragment() {
     private var selectedUser: Users? = null
     private var selectedPost: Post? = null
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -49,7 +48,6 @@ class SearchFragment : Fragment() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
-
             override fun onQueryTextChange(newText: String?): Boolean {
                 filterUsersByUsername(newText)
                 return true
@@ -85,19 +83,16 @@ class SearchFragment : Fragment() {
                     }
                     binding.progressBar.visibility = View.GONE
                 }
-
                 is Resource.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                     binding.rvUsername.visibility = View.GONE
                 }
-
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
                 }
             }
         }
     }
-
 
     private fun observePostResult() {
         viewModel.postResult.observe(viewLifecycleOwner) { resource ->
@@ -106,12 +101,10 @@ class SearchFragment : Fragment() {
                     postAdapter.submitList(resource.data)
                     binding.progressBar.visibility = View.GONE
                 }
-
                 is Resource.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                     binding.rvPost.visibility = View.GONE
                 }
-
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
                 }

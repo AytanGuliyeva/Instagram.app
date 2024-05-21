@@ -21,6 +21,7 @@ import com.example.instagramapp.ui.main.comment.CommentsBottomSheetFragment
 import com.example.instagramapp.ui.main.story.adapter.StoryAdapter
 import com.example.instagramapp.ui.search.adapter.PostSearchAdapter
 import com.example.instagramapp.base.util.Resource
+import com.example.instagramapp.data.model.PostInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,9 +52,7 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         readPreference()
-        setupRecyclerView()
         observePostData()
-        viewModel.readStory()
         firestore.collection(ConstValues.USERS).document(auth.currentUser!!.uid).update("token",token)
         initNavigationListener()
     }
@@ -82,7 +81,7 @@ class MainFragment : Fragment() {
 ////                                    binding.progressBar.visibility = View.GONE
 //                                }
 //                        }
-                        postAdapter.submitList(posts)
+                        initRecyclerView(posts)
                         binding.progressBar.visibility = View.GONE
                     }
                 }
@@ -187,8 +186,11 @@ class MainFragment : Fragment() {
             Log.e("TAG", "readPreference: $token", )
         }
     }
-    private fun setupRecyclerView() {
-        postAdapter = PostSearchAdapter(itemClick = {
+    private fun initRecyclerView(posts: List<PostInfo>) {
+
+        postAdapter = PostSearchAdapter(
+            posts,
+            itemClick = {
             // selectedPost = it;postDetail(selectedPost!!.postId, selectedPost!!.userId)
         },
             commentButtonClick = { postId ->

@@ -8,5 +8,6 @@ data class Post(
     val userId: String = "",
     val time: Timestamp? = null,
     val postImageUrl: String = "",
-    var isLiked:Boolean=false
+    var isLiked:Boolean=false,
+    var isSave:Boolean=false
 )
