@@ -273,4 +273,13 @@
             android:name="userId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/storyViewBottomSheetFragment"
+        android:name="com.example.instagramapp.ui.main.story.storyView.StoryViewBottomSheetFragment"
+        android:label="fragment_story_view_bottom_sheet"
+        tools:layout="@layout/fragment_story_view_bottom_sheet" >
+        <argument
+            android:name="storyId"
+            app:argType="string" />
+    </fragment>
 </navigation>

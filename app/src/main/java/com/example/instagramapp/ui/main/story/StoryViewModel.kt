@@ -26,7 +26,7 @@ class StoryViewModel @Inject constructor(val firestore: FirebaseFirestore, val a
     val storyInformation: LiveData<Resource<List<Story>>>
         get() = _storyInformation
 
-    //     fun getUserInfo(userId: String) {
+//         fun getUserInfo(userId: String) {
 //
 //        firestore.collection("Users").document(userId)
 //            .get().addOnSuccessListener { value ->
@@ -87,6 +87,7 @@ class StoryViewModel @Inject constructor(val firestore: FirebaseFirestore, val a
             null
         }
     }
+
 
     fun addView(storyId: String, userId: String) {
         firestore.collection(ConstValues.STORY).document(userId)

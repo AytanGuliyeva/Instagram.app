@@ -1,5 +1,6 @@
 package com.example.instagramapp.ui.search.userDetail.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -22,10 +23,11 @@ class UserAdapter(
         }
     }
 
-    private val diffUtil = AsyncListDiffer(this, diffUtilCallBack)
+     val diffUtil = AsyncListDiffer(this, diffUtilCallBack)
 
     fun submitList(user: List<Users>) {
         diffUtil.submitList(user)
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {

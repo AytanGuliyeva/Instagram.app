@@ -27,10 +27,11 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:contentDescription="@string/like"
-            android:padding="13dp"
+            android:padding="11dp"
             android:src="@drawable/like_icon"
+            app:layout_constraintBottom_toBottomOf="@id/btnDm"
             app:layout_constraintEnd_toStartOf="@id/btnDm"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/btnDm" />
 
         <ImageButton
             android:id="@+id/btnDm"
@@ -119,6 +120,5 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </androidx.core.widget.NestedScrollView>

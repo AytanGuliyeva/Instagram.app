@@ -124,41 +124,41 @@ class UserDetailViewModel @Inject constructor(
 
 
     fun followClickListener(userId: String) {
+        val currentUserUid = Firebase.auth.currentUser!!.uid
+
         if (_isFollowing.value == true) {
-            firestore.collection(ConstValues.FOLLOW).document(Firebase.auth.currentUser!!.uid)
-                .update(
-                    "following.$userId",
-                    FieldValue.delete()
-                ).addOnSuccessListener {
-                firestore.collection(ConstValues.FOLLOW).document(userId).update(
-                    "followers.$auth",
-                    FieldValue.delete()
-                ).addOnSuccessListener {
-                    _isFollowing.postValue(false)
-                }.addOnFailureListener { exception ->
-                    Log.e("UserDetailViewModel", "Error updating follower data: $exception")
+            firestore.collection(ConstValues.FOLLOW).document(currentUserUid)
+                .update("following.$userId", FieldValue.delete())
+                .addOnSuccessListener {
+                    firestore.collection(ConstValues.FOLLOW).document(userId)
+                        .update("followers.$currentUserUid", FieldValue.delete())
+                        .addOnSuccessListener {
+                            _isFollowing.postValue(false)
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("UserDetailViewModel", "Error updating follower data: $exception")
+                        }
                 }
-            }.addOnFailureListener { exception ->
-                Log.e("UserDetailViewModel", "Error updating following data: $exception")
-            }
+                .addOnFailureListener { exception ->
+                    Log.e("UserDetailViewModel", "Error updating following data: $exception")
+                }
         } else {
-            val following = hashMapOf<String, Boolean>()
-            following[userId] = true
+            val following = hashMapOf(userId to true)
+            val follower = hashMapOf(currentUserUid to true)
 
-            val follower = hashMapOf<String, Boolean>()
-            follower[Firebase.auth.currentUser!!.uid] = true
-
-            firestore.collection(ConstValues.FOLLOW).document(Firebase.auth.currentUser!!.uid)
+            firestore.collection(ConstValues.FOLLOW).document(currentUserUid)
                 .set(mapOf(ConstValues.FOLLOWING to following), SetOptions.merge())
                 .addOnSuccessListener {
                     firestore.collection(ConstValues.FOLLOW).document(userId)
                         .set(mapOf(ConstValues.FOLLOWERS to follower), SetOptions.merge())
                         .addOnSuccessListener {
                             _isFollowing.postValue(true)
-                        }.addOnFailureListener { exception ->
+                        }
+                        .addOnFailureListener { exception ->
                             Log.e("UserDetailViewModel", "Error updating follower data: $exception")
                         }
-                }.addOnFailureListener { exception ->
+                }
+                .addOnFailureListener { exception ->
                     Log.e("UserDetailViewModel", "Error updating following data: $exception")
                 }
         }

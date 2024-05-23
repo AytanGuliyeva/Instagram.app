@@ -29,9 +29,9 @@
             android:layout_marginStart="5dp"
             tools:text="@string/username"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/imgPost"
+            app:layout_constraintBottom_toBottomOf="@id/imgProfile"
             app:layout_constraintStart_toEndOf="@id/imgProfile"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/imgProfile" />
 
         <ImageButton
             android:id="@+id/btnOption"

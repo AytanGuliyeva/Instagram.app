@@ -40,6 +40,10 @@ class PostDetailViewModel @Inject constructor(
     val loading: LiveData<Boolean>
         get() = _loading
 
+    private val _postDeleted = MutableLiveData<Resource<Boolean>>()
+    val postDeleted: LiveData<Resource<Boolean>>
+        get() = _postDeleted
+
 
     private val _postResult = MutableLiveData<Resource<Post>>()
     val postResult: LiveData<Resource<Post>>
@@ -64,6 +68,20 @@ class PostDetailViewModel @Inject constructor(
             .addOnFailureListener { exception ->
                 Log.e(TAG, "com.example.instagramapp.data.model.Post fetch failure: ${exception.message}")
                 _postResult.postValue(Resource.Error(exception))
+                _loading.postValue(false)
+            }
+    }
+    fun deletePost(postId: String) {
+        _loading.postValue(true)
+        firestore.collection(ConstValues.POSTS).document(postId).delete()
+            .addOnSuccessListener {
+                Log.d(TAG, "Post successfully deleted")
+                _postDeleted.postValue(Resource.Success(true))
+                _loading.postValue(false)
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "Error deleting post: ${exception.message}")
+                _postDeleted.postValue(Resource.Error(exception))
                 _loading.postValue(false)
             }
     }

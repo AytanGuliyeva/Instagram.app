@@ -16,6 +16,7 @@ import com.example.instagramapp.R
 import com.example.instagramapp.databinding.FragmentStoryBinding
 import com.example.instagramapp.data.model.Story
 import com.example.instagramapp.base.util.Resource
+import com.example.instagramapp.ui.main.story.storyView.StoryViewBottomSheetFragment
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -53,11 +54,28 @@ class StoryFragment : Fragment(), StoriesProgressView.StoriesListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.storyView.visibility=View.GONE
         storiesProgressView = binding.stories
         binding.storyDelete.visibility = View.GONE
 
         if (args.userId == auth.currentUser!!.uid) {
             binding.storyDelete.visibility = View.VISIBLE
+            binding.storyView.visibility=View.VISIBLE
+
+        }
+        binding.storyView.setOnClickListener {
+            val selectedStory = storyList[counter]
+            val storyId = selectedStory.storyId
+            val userId = args.userId
+
+            val args = Bundle().apply {
+                putString("storyId", storyId)
+                putString("userId", userId)
+            }
+
+            val bottomSheetFragment = StoryViewBottomSheetFragment()
+            bottomSheetFragment.arguments = args
+            bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
         }
         viewModel.getStories(args.userId)
         viewModel.storyInformation.observe(viewLifecycleOwner) { storyResource ->

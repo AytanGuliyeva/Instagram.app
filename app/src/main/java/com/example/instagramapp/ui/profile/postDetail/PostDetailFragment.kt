@@ -1,10 +1,12 @@
 package com.example.instagramapp.ui.profile.postDetail
 
+import android.app.AlertDialog
 import com.example.instagramapp.data.model.Post
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -37,6 +39,22 @@ class PostDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initListener()
 
+        viewModel.postDeleted.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    if (resource.data == true) {
+                        Toast.makeText(requireContext(), "Post deleted", Toast.LENGTH_SHORT).show()
+                        findNavController().popBackStack()
+                    }
+                }
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), "Error deleting post", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> {
+                    // Show a loading indicator if needed
+                }
+            }
+        }
         viewModel.userInformation.observe(viewLifecycleOwner) { userResource ->
             when (userResource) {
                 is Resource.Success -> {
@@ -156,5 +174,23 @@ class PostDetailFragment : Fragment() {
         binding.btnBack.setOnClickListener {
             findNavController().popBackStack()
         }
+        binding.btnOption.setOnClickListener {
+            showDeleteConfirmationDialog()
+        }
     }
+
+    private fun showDeleteConfirmationDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Delete Post")
+            .setMessage("Are you sure you want to delete this post?")
+            .setPositiveButton("Delete") { dialog, _ ->
+                viewModel.deletePost(args.postId)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
 }
